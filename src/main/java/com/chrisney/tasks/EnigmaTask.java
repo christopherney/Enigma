@@ -15,6 +15,7 @@ public class EnigmaTask extends AbstractTask {
 
     public String hash;
     public String[] ignoredClasses = null;
+    public String[] classes = null;
     public String customFunction = null;
     public DefaultTask customEncryptionTask = null;
     public boolean injectFakeKeys = true;
@@ -50,12 +51,26 @@ public class EnigmaTask extends AbstractTask {
         codeParser.customFunctionName = this.customFunction;
 
         for (File javaFile : this.getAllJavaFiles()) {
-            if (this.isIgnored(javaFile)) {
+            if (!isSelected(javaFile) || isIgnored(javaFile)) {
                 System.out.println("\uD83D\uDEAB️ " + javaFile.getName() + " ignored");
             } else {
                 encryptJavaFile(javaFile);
             }
         }
+    }
+
+    private boolean isSelected(File javaFile) {
+        if (this.classes != null) {
+            for (String ignored : this.classes) {
+                String path = ignored.replace(".", File.separator)
+                        .replace( File.separator + "java", ".java");
+                if (javaFile.getAbsolutePath().endsWith(path)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
     }
 
     private boolean isIgnored(File javaFile) {
@@ -80,13 +95,13 @@ public class EnigmaTask extends AbstractTask {
         }
 
         String contents = FileUtils.readFileToString(srcFile, "UTF-8");
-        contents = codeParser.encode(this.hash, contents, this.injectFakeKeys);
+        // contents = codeParser.encode(this.hash, contents, this.injectFakeKeys);
         FileUtils.writeStringToFile(srcFile, contents, "UTF-8");
 
         System.out.println("\uD83D\uDD10 " + srcFile.getName() + " encrypted");
 
         // @TODO TESTS !!!
         JavaParser p = new JavaParser();
-        // p.parse(contents);
+        p.parse(contents);
     }
 }

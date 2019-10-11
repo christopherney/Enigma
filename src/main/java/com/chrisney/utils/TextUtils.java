@@ -29,6 +29,6 @@ public class TextUtils {
     }
 
     public static boolean isReturnChar(Character c) {
-        return c.equals('\r') || c.equals('\n');
+        return c.equals('\r') || c.equals('\n') || c.equals(System.lineSeparator().charAt(0));
     }
 }

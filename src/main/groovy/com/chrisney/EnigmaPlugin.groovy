@@ -56,6 +56,7 @@ class EnigmaPlugin implements Plugin<Project> {
                 pathSrc = project.rootDir.absolutePath + extension.srcJava
                 hash = extension.hash
                 ignoredClasses = extension.ignoredClasses
+                classes = extension.classes
                 customFunction = extension.customFunction
                 customEncryptionTask = customEncryptTask
                 injectFakeKeys = extension.injectFakeKeys

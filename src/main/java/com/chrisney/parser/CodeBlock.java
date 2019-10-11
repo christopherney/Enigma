@@ -78,6 +78,6 @@ public class CodeBlock {
 
     @Override
     public String toString() {
-        return "[" + start + ", " + end + "] (" + type + ") " + wordsToString();
+        return "[" + start + ", " + end + "] (" + type + ":" + name + ") " + wordsToString();
     }
 }

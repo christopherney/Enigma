@@ -114,16 +114,17 @@ public class JavaParser {
      * @param sourceCode JAVA source code
      * @return Code blocks
      */
-    public JavaClass parse(String sourceCode) {
+    public JavaCode parse(String sourceCode) {
         ArrayList<CodeString> strings = new ArrayList<>();
         ArrayList<CodeBlock> blocks = this.parse(sourceCode, null, strings);
 
-        JavaClass javaClass =  new JavaClass(blocks, strings);
+        JavaCode javaClass =  new JavaCode(blocks, strings);
         // TEST:
-        /*
+
         for (CodeBlock b : javaClass.getAllBlocks()) {
             System.out.println(b.toString());
         }
+        /*
         for (CodeString s : javaClass.getStringValues()) {
             System.out.println(s.toString());
         }
@@ -158,16 +159,6 @@ public class JavaParser {
             Character c = source.charAt(i);
             Character nextC = (i < source.length() - 1) ? source.charAt(i + 1) : ' ';
 
-            // Brackets & parenthesis counters:
-            if (c.equals(cCurlyBracketOpen)) counterCurlyBrackets++;
-            if (c.equals(cCurlyBracketClose)) counterCurlyBrackets--;
-            if (c.equals(cParenthesisOpen)) counterParenthesis++;
-            if (c.equals(cParenthesisClose)) counterParenthesis--;
-            if (c.equals(cBracketOpen)) counterBrackets++;
-            if (c.equals(cBracketClose)) counterBrackets--;
-
-            // #TODO identify annotation blocks + comments blocks
-
             // Track String values and comments blocks:
             if (currentBlock == CodeBlock.BlockType.Undefined) {
                 if (c.equals(cDoubleQuote) && !prevC.equals(cEscape)) {
@@ -176,21 +167,19 @@ public class JavaParser {
                     currentBlock = CodeBlock.BlockType.CommentLine;
                 } else if (c.equals(cSlash) && nextC.equals(cStar)) {
                     currentBlock = CodeBlock.BlockType.CommentBlock;
-                } else if (c.equals(cAnnotation)) {
+                } else if (c.equals(cAnnotation) && word == null) {
                     currentBlock = CodeBlock.BlockType.Annotation;
                 }
-            } else if (currentBlock == CodeBlock.BlockType.StringValue) {
-                if (c.equals(cDoubleQuote) && !prevC.equals(cEscape))
-                    currentBlock = CodeBlock.BlockType.Undefined;
-            } else if (currentBlock == CodeBlock.BlockType.CommentLine) {
-                if (TextUtils.isReturnChar(c))
-                    currentBlock = CodeBlock.BlockType.Undefined;
-            } else if (currentBlock == CodeBlock.BlockType.CommentBlock) {
-                if (c.equals(cSlash) && prevC.equals(cStar))
-                    currentBlock = CodeBlock.BlockType.Undefined;
-            } else if (currentBlock == CodeBlock.BlockType.Annotation) {
-                if (c.equals(cParenthesisClose) && counterParenthesis == 0)
-                    currentBlock = CodeBlock.BlockType.Undefined;
+            }
+
+            // Brackets & parenthesis counters:
+            if (currentBlock != CodeBlock.BlockType.CommentLine && currentBlock != CodeBlock.BlockType.CommentBlock) {
+                if (c.equals(cCurlyBracketOpen)) counterCurlyBrackets++;
+                if (c.equals(cCurlyBracketClose)) counterCurlyBrackets--;
+                if (c.equals(cParenthesisOpen)) counterParenthesis++;
+                if (c.equals(cParenthesisClose)) counterParenthesis--;
+                if (c.equals(cBracketOpen)) counterBrackets++;
+                if (c.equals(cBracketClose)) counterBrackets--;
             }
 
             // String value detection
@@ -205,12 +194,14 @@ public class JavaParser {
                 }
             }
 
-            // Build Words sequence;
+            // Start new word:
             if (word == null && !TextUtils.isEmptyChar(c) && !TextUtils.inCharactersList(charBreaks, c)) {
                 word = new CodeString(i);
 
-            } else if (TextUtils.isEmptyChar(c) || TextUtils.inCharactersList(charBreaks, c)) {
+            } else if (TextUtils.isEmptyChar(c) || TextUtils.inCharactersList(charBreaks, c) ||
+                    (currentBlock == CodeBlock.BlockType.CommentBlock && c.equals(cSlash) && prevC.equals(cStar))) {
 
+                // End of current word, then create word object:
                 if (word != null) {
                     word.end = i;
                     word.value = source.substring(word.start, word.end);
@@ -232,6 +223,7 @@ public class JavaParser {
                     block.words.add(word);
                 }
 
+                // Start new word:
                 word = new CodeString(i);
                 word.end = i;
                 word.value = String.valueOf(c);
@@ -242,34 +234,60 @@ public class JavaParser {
             }
 
             // Detect END of block
-            if (block != null && (c.equals(cSemicolon) || c.equals(cCurlyBracketClose))
-                    && counterCurlyBrackets == 0 && counterParenthesis == 0) {
+            if (block != null) {
 
-                block.end = i + 1;
-                block.code = source.substring(block.start, block.end).trim();
+                if ((
+                        (c.equals(cSemicolon) || c.equals(cCurlyBracketClose)) // End of Line of code, End of Class, Function, Condition, Loop...
+                        || (currentBlock == CodeBlock.BlockType.Annotation && (TextUtils.isEmptyChar(c) || c.equals(cParenthesisClose))) // End of Annotation
+                        || (currentBlock == CodeBlock.BlockType.CommentLine && TextUtils.isReturnChar(c)) // End of Comment line
+                        || (currentBlock == CodeBlock.BlockType.CommentBlock && c.equals(cSlash) && prevC.equals(cStar)) // End of Comment Block
+                ) &&  counterCurlyBrackets == 0 && counterParenthesis == 0 && counterBrackets == 0) {
 
-                if (block.code.endsWith(String.valueOf(cCurlyBracketClose))) {
-                    int j;
-                    for (j = 0; j < block.code.length(); j++) {
-                        if (block.code.charAt(j) == cCurlyBracketOpen) break;
+                    block.end = i + 1;
+                    block.code = source.substring(block.start, block.end);
+                    System.out.println(block.code);
+
+                    // Analyze sub source code:
+                    if (block.code.endsWith(String.valueOf(cCurlyBracketClose))) {
+                        int j;
+                        for (j = 0; j < block.code.length(); j++) {
+                            if (block.code.charAt(j) == cCurlyBracketOpen) break;
+                        }
+                        String subCode = block.code.substring(j + 1, block.code.length() - 1);
+                        // System.out.println(subCode);
+                        block.subBlocks = this.parse(subCode, block, null);
                     }
-                    String subCode = block.code.substring(j + 1, block.code.length() - 1);
-                    // System.out.println(subCode);
-                    block.subBlocks = this.parse(subCode, block, null);
+
+                    // Set block type:
+                    block.type = getBlockType(block);
+
+                    // Search block name (function or classname) :
+                    if (block.type == CodeBlock.BlockType.Class || block.type == CodeBlock.BlockType.Function
+                            || block.type == CodeBlock.BlockType.Interface) {
+                        block.name = getBlockName(block);
+                    } else if (block.type == CodeBlock.BlockType.Package || block.type == CodeBlock.BlockType.Import) {
+                        block.name = getPackageOrImportName(block);
+                    }
+
+                    blocks.add(block);
+                    block = null;
                 }
-
-                block.type = getBlockType(block);
-
-                if (block.type == CodeBlock.BlockType.Class || block.type == CodeBlock.BlockType.Function) {
-                    System.out.println("TO STRING : " + block.wordsToString());
-                    block.name = getBlockName(block);
-                    System.out.println("NAME : " + block.name);
-                }
-
-                blocks.add(block);
-                block = null;
             }
 
+            // Detect end block type:
+            if (currentBlock == CodeBlock.BlockType.StringValue) {
+                if (c.equals(cDoubleQuote) && !prevC.equals(cEscape))
+                    currentBlock = CodeBlock.BlockType.Undefined;
+            } else if (currentBlock == CodeBlock.BlockType.CommentLine) {
+                if (TextUtils.isReturnChar(c))
+                    currentBlock = CodeBlock.BlockType.Undefined;
+            } else if (currentBlock == CodeBlock.BlockType.CommentBlock) {
+                if (c.equals(cSlash) && prevC.equals(cStar))
+                    currentBlock = CodeBlock.BlockType.Undefined;
+            } else if (currentBlock == CodeBlock.BlockType.Annotation) {
+                if ((c.equals(cParenthesisClose) || TextUtils.isReturnChar(c)) && counterParenthesis == 0)
+                    currentBlock = CodeBlock.BlockType.Undefined;
+            }
 
         } // End for loop
 
@@ -296,6 +314,15 @@ public class JavaParser {
         return false;
     }
 
+    private String getPackageOrImportName(CodeBlock block) {
+        StringBuilder sb = new StringBuilder();
+        for(CodeString word : block.words) {
+            if (!TextUtils.isEmpty(word.value.trim()) && !isBreakCharacter(word.value) && !isBreakCharacter(word.value))
+                sb.append(word.value);
+        }
+        return sb.toString();
+    }
+
     private String getBlockName(CodeBlock block) {
         for(CodeString word : block.words) {
             if (!word.isInstruction && !word.isType
@@ -316,6 +343,7 @@ public class JavaParser {
     private CodeBlock.BlockType getBlockType(CodeBlock block) {
         if (block.subBlocks != null && block.subBlocks.size() > 0) {
             CodeString firstWord = getFirstWord(block.words);
+            if (firstWord.value.startsWith(String.valueOf(cAnnotation))) return CodeBlock.BlockType.Annotation;
             if (firstWord.value.equals(sIf) || firstWord.value.equals(sElse) || firstWord.value.equals(sSwitch))
                 return CodeBlock.BlockType.Condition;
             if (firstWord.value.equals(sFor) || firstWord.value.equals(sWhile)) return CodeBlock.BlockType.Loop;
@@ -336,6 +364,9 @@ public class JavaParser {
                 if (word.value.equals(sFor) || word.value.equals(sWhile)) return CodeBlock.BlockType.Loop;
                 if (word.value.equals(sReturn)) return CodeBlock.BlockType.Return;
                 if (word.value.equals(sClass)) return CodeBlock.BlockType.Class;
+                if (word.value.startsWith(String.valueOf(cAnnotation))) return CodeBlock.BlockType.Annotation;
+                if (word.value.startsWith(sBlockCommentStart)) return CodeBlock.BlockType.CommentBlock;
+                if (word.value.startsWith(sLineComment)) return CodeBlock.BlockType.CommentLine;
             }
         }
 

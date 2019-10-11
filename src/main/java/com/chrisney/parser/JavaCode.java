@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * Map a Java file
  */
-public class JavaClass {
+public class JavaCode {
 
     /**
      * All blocks of codes
@@ -22,7 +22,7 @@ public class JavaClass {
      * @param blocks Blocks of codes
      * @param strings String values
      */
-    public JavaClass(ArrayList<CodeBlock> blocks, ArrayList<CodeString> strings) {
+    public JavaCode(ArrayList<CodeBlock> blocks, ArrayList<CodeString> strings) {
         this.codeBlocks = blocks;
         this.codeStrings = strings;
     }
