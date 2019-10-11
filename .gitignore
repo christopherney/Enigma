@@ -92,3 +92,11 @@ fabric.properties
 
 # End of https://www.gitignore.io/api/intellij
 
+# Local Maven Repository (for testing)
+repo/
+
+# Build directory
+build/
+
+# Gradle 
+.gradle/
