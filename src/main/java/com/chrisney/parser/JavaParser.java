@@ -245,7 +245,6 @@ public class JavaParser {
 
                     block.end = i + 1;
                     block.code = source.substring(block.start, block.end);
-                    System.out.println(block.code);
 
                     // Analyze sub source code:
                     if (block.code.endsWith(String.valueOf(cCurlyBracketClose))) {
