@@ -42,7 +42,39 @@ android {
 }
 ```
 
-And Build you App !
+## Compile your App
+
+Simply build your App
 ```sh
-$ ./gradlew assembleRelease 
+$ ./gradlew assembleRelease
+```
+```sh
+> Task :app:backup
+💾 Backup: /app/src/main/java/com/app/helloworld/MainActivity.java
+💾 Backup: /app/src/main/java/com/app/helloworld/helpers/IResponse.java
+💾 Backup: /app/src/main/java/com/app/helloworld/helpers/Utils.java
+💾 Backup: /app/src/main/java/com/app/helloworld/helpers/ATest.java
+💾 Backup: /app/src/main/java/com/app/helloworld/helpers/TestImpl.java
+💾 Backup: /app/src/main/java/com/app/helloworld/Constants.java
+
+> Task :app:encrypt
+🔐 MainActivity.java encrypted
+🔐 IResponse.java encrypted
+🔐 Utils.java encrypted
+🔐 ATest.java encrypted
+🔐 TestImpl.java encrypted
+🔐 Constants.java encrypted
+
+> Task :app:injectCode
+✏️ Add Enigma code
+
+> Task :app:restore
+♻️ Restore: /app/src/main/java/com/proto/helloworld/MainActivity.java
+♻️ Restore: /app/src/main/java/com/app/helloworld/helpers/IResponse.java
+♻️ Restore: /app/src/main/java/com/app/helloworld/helpers/Utils.java
+♻️ Restore: /app/src/main/java/com/app/helloworld/helpers/ATest.java
+♻️ Restore: /app/src/main/java/com/app/helloworld/helpers/TestImpl.java
+♻️ Restore: /app/src/main/java/com/app/helloworld/Constants.java
+🧹 Remove Enigma code: ~/HelloWorld/app/src/main/java/com/app
+
 ```
