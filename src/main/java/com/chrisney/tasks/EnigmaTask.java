@@ -17,9 +17,9 @@ public class EnigmaTask extends AbstractTask {
     public String[] ignoredClasses = null;
     public String customFunction = null;
     public DefaultTask customEncryptionTask = null;
+    public boolean injectFakeKeys = true;
 
-    private CodeParser codeParser = new CodeParser();
-    private JavaParser p = new JavaParser();
+    private CodeParser codeParser;
 
     @Inject
     public EnigmaTask() {
@@ -45,6 +45,7 @@ public class EnigmaTask extends AbstractTask {
         }
 
         // Set Custom encryption task if exists;
+        codeParser = new CodeParser(this.debug);
         codeParser.encryptTask = this.customEncryptionTask;
         codeParser.customFunctionName = this.customFunction;
 
@@ -79,12 +80,13 @@ public class EnigmaTask extends AbstractTask {
         }
 
         String contents = FileUtils.readFileToString(srcFile, "UTF-8");
-        // contents = codeParser.encode(this.hash, contents);
+        contents = codeParser.encode(this.hash, contents, this.injectFakeKeys);
         FileUtils.writeStringToFile(srcFile, contents, "UTF-8");
 
         System.out.println("\uD83D\uDD10 " + srcFile.getName() + " encrypted");
 
         // @TODO TESTS !!!
-        p.parse(contents);
+        JavaParser p = new JavaParser();
+        // p.parse(contents);
     }
 }

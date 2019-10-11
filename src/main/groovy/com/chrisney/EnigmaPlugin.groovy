@@ -31,12 +31,14 @@ class EnigmaPlugin implements Plugin<Project> {
                 enabled = extension.enabled
                 rootProject = project.rootDir.absolutePath
                 pathSrc = project.rootDir.absolutePath + extension.srcJava
+                debug = extension.debug
             }
 
             project.task('backup', type: BackupTask) {
                 enabled = extension.enabled
                 rootProject = project.rootDir.absolutePath
                 pathSrc = project.rootDir.absolutePath + extension.srcJava
+                debug = extension.debug
             }
 
             project.task('injectCode', type: InjectCodeTask) {
@@ -45,6 +47,7 @@ class EnigmaPlugin implements Plugin<Project> {
                 pathSrc = project.rootDir.absolutePath + extension.srcJava
                 hash = extension.hash
                 customFunction = extension.customFunction
+                debug = extension.debug
             }
 
             project.task('encrypt', type: EnigmaTask) {
@@ -55,12 +58,15 @@ class EnigmaPlugin implements Plugin<Project> {
                 ignoredClasses = extension.ignoredClasses
                 customFunction = extension.customFunction
                 customEncryptionTask = customEncryptTask
+                injectFakeKeys = extension.injectFakeKeys
+                debug = extension.debug
             }
 
             project.task('restore', type: RestoreTask) {
                 enabled = extension.enabled
                 rootProject = project.rootDir.absolutePath
                 pathSrc = project.rootDir.absolutePath + extension.srcJava
+                debug = extension.debug
             }
 
             project.tasks.getByName('clean').dependsOn('cleanBackup')

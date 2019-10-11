@@ -42,12 +42,17 @@ public class CodeParser {
         StringValue
     }
 
-    public CodeParser() {}
+    private boolean debug = false;
 
-    public String encode(String key, String content) throws Exception {
+    public CodeParser(boolean debug) {
+        this.debug = debug;
+    }
+
+    public String encode(String key, String content, boolean injectFakeKeys) throws Exception {
         content = addImport(content);
         content = secureString(key, content);
-        content = injectFakeKeys(content);
+        if (injectFakeKeys)
+            content = injectFakeKeys(content);
         // System.out.println(content);
         return content;
     }
@@ -152,7 +157,9 @@ public class CodeParser {
                 }
 
                 currentCodeBlock = CodeBlock.Undefined;
-                System.out.println(" - String to encrypt : \"" + value + "\"");
+
+                if (this.debug)
+                    System.out.println(" - String to encrypt : \"" + value + "\"");
             }
         }
 

@@ -21,6 +21,7 @@ public class AbstractTask extends DefaultTask {
             "!.gitignore";
 
     public boolean enabled = true;
+    public boolean debug = false;
     public String rootProject;
     public String pathSrc;
 

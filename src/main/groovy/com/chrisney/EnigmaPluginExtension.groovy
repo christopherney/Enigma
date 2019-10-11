@@ -9,4 +9,6 @@ class EnigmaPluginExtension {
     String[] ignoredClasses = null
     String customFunction = null
     String encryptionTaskName = null;
+    boolean injectFakeKeys = true;
+    boolean debug = false;
 }
