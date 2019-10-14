@@ -60,11 +60,12 @@ public class JavaParser {
     private static final String sSynchronized = "synchronized";
     private static final String sVolatile = "volatile";
     private static final String sNative = "native";
+    private static final String sThrows = "throws";
 
     private static final String[] keywords = {
             sPackage, sImport, sClass, sAbstract, sInterface, sExtends, sImplements, sPublic, sPrivate, sProtected,
             sVoid, sStatic, sFinal, sNew, sSuper, sTry, sCatch, sIf, sElse, sSwitch, sCase, sBreak, sContinue, sFor,
-            sWhile, sReturn, sEnum, sTransient, sStrictfp, sSynchronized, sVolatile, sNative
+            sWhile, sReturn, sEnum, sTransient, sStrictfp, sSynchronized, sVolatile, sNative, sThrows
     };
 
     private static final String tBool = "bool";
@@ -97,11 +98,12 @@ public class JavaParser {
     private static final String tObject = "Object";
     private static final String tNumber = "Number";
     private static final String tEnum = "Enum";
+    private static final String tException = "Exception";
 
     private static final String[] types = {
             tBool, tBoolObject, tByte, tByteObject, tShort, tShortObject, tInt, tIntObject, tDouble, tDoubleObject,
             tLong, tLongObject, tFloat, tFloatObject, tChar, tCharObject, tString, tStringBuffer, tDate, tArray,
-            tList, tArrayList, tMap, tHashMap, tHashSet, tHashTable, tStringBuilder, tObject, tNumber, tEnum
+            tList, tArrayList, tMap, tHashMap, tHashSet, tHashTable, tStringBuilder, tObject, tNumber, tEnum, tException
     };
 
     /**
@@ -120,15 +122,12 @@ public class JavaParser {
 
         JavaCode javaClass =  new JavaCode(blocks, strings);
         // TEST:
-
         for (CodeBlock b : javaClass.getAllBlocks()) {
             System.out.println(b.toString());
         }
-        /*
         for (CodeString s : javaClass.getStringValues()) {
             System.out.println(s.toString());
         }
-        */
         return javaClass;
     }
 
@@ -140,7 +139,6 @@ public class JavaParser {
      */
     private ArrayList<CodeBlock> parse(String source, CodeBlock parent, ArrayList<CodeString> strings) {
 
-        ArrayList<CodeString> words = new ArrayList<>();
         ArrayList<CodeBlock> blocks = new ArrayList<>();
 
         int counterCurlyBrackets = 0;
@@ -155,31 +153,32 @@ public class JavaParser {
 
         for (int i = 0; i < source.length(); i++) {
 
-            Character prevC = (i > 0) ? source.charAt(i - 1) : ' ';
-            Character c = source.charAt(i);
-            Character nextC = (i < source.length() - 1) ? source.charAt(i + 1) : ' ';
+            Character prevChar = (i > 0) ? source.charAt(i - 1) : ' ';
+            Character curChar = source.charAt(i);
+            Character nextChar = (i < source.length() - 1) ? source.charAt(i + 1) : ' ';
+            Character nextNoneEmptyChar = getNextNoneEmptyChar(source, i + 1);
 
             // Track String values and comments blocks:
             if (currentBlock == CodeBlock.BlockType.Undefined) {
-                if (c.equals(cDoubleQuote) && !prevC.equals(cEscape)) {
+                if (curChar.equals(cDoubleQuote) && !prevChar.equals(cEscape)) {
                     currentBlock = CodeBlock.BlockType.StringValue;
-                } else if (c.equals(cSlash) && nextC.equals(cSlash)) {
+                } else if (curChar.equals(cSlash) && nextChar.equals(cSlash)) {
                     currentBlock = CodeBlock.BlockType.CommentLine;
-                } else if (c.equals(cSlash) && nextC.equals(cStar)) {
+                } else if (curChar.equals(cSlash) && nextChar.equals(cStar)) {
                     currentBlock = CodeBlock.BlockType.CommentBlock;
-                } else if (c.equals(cAnnotation) && word == null) {
+                } else if (curChar.equals(cAnnotation) && counterParenthesis == 0 && word == null) {
                     currentBlock = CodeBlock.BlockType.Annotation;
                 }
             }
 
             // Brackets & parenthesis counters:
             if (currentBlock != CodeBlock.BlockType.CommentLine && currentBlock != CodeBlock.BlockType.CommentBlock) {
-                if (c.equals(cCurlyBracketOpen)) counterCurlyBrackets++;
-                if (c.equals(cCurlyBracketClose)) counterCurlyBrackets--;
-                if (c.equals(cParenthesisOpen)) counterParenthesis++;
-                if (c.equals(cParenthesisClose)) counterParenthesis--;
-                if (c.equals(cBracketOpen)) counterBrackets++;
-                if (c.equals(cBracketClose)) counterBrackets--;
+                if (curChar.equals(cCurlyBracketOpen)) counterCurlyBrackets++;
+                if (curChar.equals(cCurlyBracketClose)) counterCurlyBrackets--;
+                if (curChar.equals(cParenthesisOpen)) counterParenthesis++;
+                if (curChar.equals(cParenthesisClose)) counterParenthesis--;
+                if (curChar.equals(cBracketOpen)) counterBrackets++;
+                if (curChar.equals(cBracketClose)) counterBrackets--;
             }
 
             // String value detection
@@ -195,11 +194,11 @@ public class JavaParser {
             }
 
             // Start new word:
-            if (word == null && !TextUtils.isEmptyChar(c) && !TextUtils.inCharactersList(charBreaks, c)) {
+            if (word == null && !TextUtils.isEmptyChar(curChar) && !TextUtils.inCharactersList(charBreaks, curChar)) {
                 word = new CodeString(i);
 
-            } else if (TextUtils.isEmptyChar(c) || TextUtils.inCharactersList(charBreaks, c) ||
-                    (currentBlock == CodeBlock.BlockType.CommentBlock && c.equals(cSlash) && prevC.equals(cStar))) {
+            } else if (TextUtils.isEmptyChar(curChar) || TextUtils.inCharactersList(charBreaks, curChar) ||
+                    isEndBlockComment(currentBlock, curChar, prevChar)) {
 
                 // End of current word, then create word object:
                 if (word != null) {
@@ -211,7 +210,6 @@ public class JavaParser {
                         word.isInstruction = isInstruction(word.value);
                         word.isType = isType(word.value);
                     }
-                    words.add(word);
 
                     // New Block detection:
                     if (block == null) {
@@ -226,8 +224,8 @@ public class JavaParser {
                 // Start new word:
                 word = new CodeString(i);
                 word.end = i;
-                word.value = String.valueOf(c);
-                words.add(word);
+                word.value = String.valueOf(curChar);
+
                 // Add words to current block:
                 if (block != null) block.words.add(word);
                 word = null;
@@ -237,10 +235,10 @@ public class JavaParser {
             if (block != null) {
 
                 if ((
-                        (c.equals(cSemicolon) || c.equals(cCurlyBracketClose)) // End of Line of code, End of Class, Function, Condition, Loop...
-                        || (currentBlock == CodeBlock.BlockType.Annotation && (TextUtils.isEmptyChar(c) || c.equals(cParenthesisClose))) // End of Annotation
-                        || (currentBlock == CodeBlock.BlockType.CommentLine && TextUtils.isReturnChar(c)) // End of Comment line
-                        || (currentBlock == CodeBlock.BlockType.CommentBlock && c.equals(cSlash) && prevC.equals(cStar)) // End of Comment Block
+                        (curChar.equals(cSemicolon) || curChar.equals(cCurlyBracketClose)) // End of Line of code, End of Class, Function, Condition, Loop...
+                        || isEndAnnotation(currentBlock, curChar, nextNoneEmptyChar, counterParenthesis) // End of Annotation
+                        || (currentBlock == CodeBlock.BlockType.CommentLine && TextUtils.isReturnChar(curChar)) // End of Comment line
+                        || isEndBlockComment(currentBlock, curChar, prevChar) // End of Comment Block
                 ) &&  counterCurlyBrackets == 0 && counterParenthesis == 0 && counterBrackets == 0) {
 
                     block.end = i + 1;
@@ -275,16 +273,16 @@ public class JavaParser {
 
             // Detect end block type:
             if (currentBlock == CodeBlock.BlockType.StringValue) {
-                if (c.equals(cDoubleQuote) && !prevC.equals(cEscape))
+                if (curChar.equals(cDoubleQuote) && !prevChar.equals(cEscape))
                     currentBlock = CodeBlock.BlockType.Undefined;
             } else if (currentBlock == CodeBlock.BlockType.CommentLine) {
-                if (TextUtils.isReturnChar(c))
+                if (TextUtils.isReturnChar(curChar))
                     currentBlock = CodeBlock.BlockType.Undefined;
             } else if (currentBlock == CodeBlock.BlockType.CommentBlock) {
-                if (c.equals(cSlash) && prevC.equals(cStar))
+                if (curChar.equals(cSlash) && prevChar.equals(cStar))
                     currentBlock = CodeBlock.BlockType.Undefined;
             } else if (currentBlock == CodeBlock.BlockType.Annotation) {
-                if ((c.equals(cParenthesisClose) || TextUtils.isReturnChar(c)) && counterParenthesis == 0)
+                if (isEndAnnotation(currentBlock, curChar, nextNoneEmptyChar,counterParenthesis))
                     currentBlock = CodeBlock.BlockType.Undefined;
             }
 
@@ -293,6 +291,55 @@ public class JavaParser {
         return blocks;
     }
 
+    /**
+     * Detect end of block annotation
+     * @param currentBlock Current block type
+     * @param curChar Current character
+     * @param nextNoneEmptyChar Next character non empty (if exists)
+     * @param parenthesisCounter Parenthesis counter
+     * @return True if end of block annotation is detected
+     */
+    private boolean isEndAnnotation(CodeBlock.BlockType currentBlock, Character curChar, Character nextNoneEmptyChar, int parenthesisCounter) {
+        if (currentBlock == CodeBlock.BlockType.Annotation && parenthesisCounter == 0) {
+            if (curChar.equals(cParenthesisClose) || (TextUtils.isEmptyChar(curChar) && Character.isAlphabetic(nextNoneEmptyChar))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Detect end of block Comment
+     * @param currentBlock Current block type
+     * @param curChar Current character
+     * @param prevChar Previous character
+     * @return True if end of block comment is detected
+     */
+    private boolean isEndBlockComment(CodeBlock.BlockType currentBlock, Character curChar, Character prevChar) {
+        return currentBlock == CodeBlock.BlockType.CommentBlock && curChar.equals(cSlash) && prevChar.equals(cStar);
+    }
+
+    /**
+     * Return the none empty character
+     * @param data String data
+     * @param index  current index
+     * @return Next none empty character
+     */
+    private char getNextNoneEmptyChar(String data, int index) {
+        char c = ' ';
+        while (index < data.length()) {
+            c = data.charAt(index);
+            if (!TextUtils.isEmptyChar(c)) break;
+            index++;
+        }
+        return c;
+    }
+
+    /**
+     * Return True is the keyword is a native Java type
+     * @param word Keyword
+     * @return True is the keyword is a native Java type
+     */
     private boolean isType(String word) {
         for (String t : types) {
             if (t.equals(word)) return true;
@@ -300,6 +347,11 @@ public class JavaParser {
         return false;
     }
 
+    /**
+     * Return True is the keyword is a Java instruction
+     * @param word Keyword
+     * @return True is the keyword is a Java instruction
+     */
     private boolean isInstruction(String word) {
         for (String k : keywords) {
             if (k.equalsIgnoreCase(word)) return true;
