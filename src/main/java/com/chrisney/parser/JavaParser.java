@@ -169,6 +169,9 @@ public class JavaParser {
                 } else if (curChar.equals(cAnnotation) && counterParenthesis == 0 && word == null) {
                     currentBlock = CodeBlock.BlockType.Annotation;
                 }
+            } else if (currentBlock == CodeBlock.BlockType.StringValue) {
+                if (curChar.equals(cDoubleQuote) && !prevChar.equals(cEscape))
+                    currentBlock = CodeBlock.BlockType.Undefined;
             }
 
             // Brackets & parenthesis counters:
@@ -186,7 +189,7 @@ public class JavaParser {
                 if (currentBlock == CodeBlock.BlockType.StringValue && string == null) {
                     string = new CodeString(i);
                 } else if (string != null && currentBlock != CodeBlock.BlockType.StringValue) {
-                    string.end = i;
+                    string.end = i + 1;
                     string.value = source.substring(string.start, string.end);
                     strings.add(string);
                     string = null;
@@ -272,10 +275,7 @@ public class JavaParser {
             }
 
             // Detect end block type:
-            if (currentBlock == CodeBlock.BlockType.StringValue) {
-                if (curChar.equals(cDoubleQuote) && !prevChar.equals(cEscape))
-                    currentBlock = CodeBlock.BlockType.Undefined;
-            } else if (currentBlock == CodeBlock.BlockType.CommentLine) {
+            if (currentBlock == CodeBlock.BlockType.CommentLine) {
                 if (TextUtils.isReturnChar(curChar))
                     currentBlock = CodeBlock.BlockType.Undefined;
             } else if (currentBlock == CodeBlock.BlockType.CommentBlock) {
