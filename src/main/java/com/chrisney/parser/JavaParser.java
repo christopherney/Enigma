@@ -185,8 +185,8 @@ public class JavaParser {
             if  (parent == null && strings != null) {
                 if (currentBlock == CodeBlock.BlockType.StringValue && string == null) {
                     string = new CodeString(i);
-                } else if (string != null && currentBlock == CodeBlock.BlockType.Undefined) {
-                    string.end = i + 1;
+                } else if (string != null && currentBlock != CodeBlock.BlockType.StringValue) {
+                    string.end = i;
                     string.value = source.substring(string.start, string.end);
                     strings.add(string);
                     string = null;
@@ -328,8 +328,10 @@ public class JavaParser {
     private char getNextNoneEmptyChar(String data, int index) {
         char c = ' ';
         while (index < data.length()) {
-            c = data.charAt(index);
-            if (!TextUtils.isEmptyChar(c)) break;
+            if (!TextUtils.isEmptyChar(data.charAt(index))) {
+                c = data.charAt(index);
+                break;
+            }
             index++;
         }
         return c;
