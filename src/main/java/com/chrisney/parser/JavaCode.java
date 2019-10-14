@@ -107,4 +107,12 @@ public class JavaCode {
         }
         return result;
     }
+
+    public String toCode() {
+        StringBuilder sb = new StringBuilder();
+        for(CodeBlock block : getAllBlocks()) {
+            if (!block.hasParent) sb.append(block.toCode());
+        }
+        return sb.toString();
+    }
 }

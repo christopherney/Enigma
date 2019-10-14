@@ -37,7 +37,12 @@ public class CodeBlock {
     /**
      * define modifier type (public, private, protected)
      */
-    public Modifier modifier = Modifier.Public;
+    public Modifier modifier = null;
+
+    /**
+     * Type name of the object returned by the function (optional)
+     */
+    public String returnType = null;
 
     /**
      * Sub blocks of code contains by the current block
@@ -48,6 +53,11 @@ public class CodeBlock {
      * Source code of the block split in words (useful for processing)
      */
     public ArrayList<CodeString> words = new ArrayList<>();
+
+    /**
+     * Indicate if the code block is nested or not.
+     */
+    public boolean hasParent = false;
 
     public enum Modifier {
         Public,
@@ -83,6 +93,42 @@ public class CodeBlock {
 
     @Override
     public String toString() {
-        return "[" + start + ", " + end + "] (" + type + ":" + name + ") " + wordsToString();
+        String m = "";
+        if (modifier != null) m = Modifier.Public + ": ";
+        return "[" + m + start + ", " + end + "] (" + type + ":" + name + ") " + wordsToString();
+    }
+
+    public String toCode() {
+        return toCode(1);
+    }
+
+    private String toCode(int tab) {
+
+        StringBuilder sbTab = new StringBuilder();
+        for(int i = 0; i < tab; i++ ) sbTab.append('\t');
+
+        StringBuilder sb = new StringBuilder();
+        if (hasParent) sb.append(sbTab.toString());
+        if (subBlocks == null || subBlocks.size() == 0) {
+            sb.append(code);
+            if(code.endsWith(";") || code.endsWith("*/") || code.endsWith(")")) sb.append("\n");
+        } else {
+            if (code.endsWith("}")) {
+                int i = 0;
+                while (code.charAt(i) != '{') {
+                    sb.append(code.charAt(i));
+                    i++;
+                }
+            }
+            sb.append("{\n");
+            for(CodeBlock subBlock : subBlocks) {
+                sb.append(subBlock.toCode(tab + 1));
+            }
+            if (code.endsWith("}")) {
+                if (hasParent) sb.append(sbTab.toString());
+                sb.append("}\n\n");
+            }
+        }
+        return sb.toString();
     }
 }

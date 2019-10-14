@@ -180,7 +180,9 @@ public class TestJavaParser {
 
         try {
             JavaParser parser = new JavaParser();
-            parser.parse(code);
+            JavaCode c = parser.parse(code);
+            String stringCode = c.toCode();
+            System.out.println(stringCode);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

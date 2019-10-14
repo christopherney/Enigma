@@ -1,5 +1,6 @@
 package com.chrisney.tasks;
 
+import com.chrisney.parser.JavaCode;
 import com.chrisney.parser.JavaParser;
 import com.chrisney.utils.AESUtils;
 import com.chrisney.utils.CodeParser;
@@ -102,6 +103,6 @@ public class EnigmaTask extends AbstractTask {
 
         // @TODO TESTS !!!
         JavaParser p = new JavaParser();
-        p.parse(contents);
+        JavaCode code = p.parse(contents);
     }
 }

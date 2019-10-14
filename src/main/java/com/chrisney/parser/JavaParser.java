@@ -217,6 +217,7 @@ public class JavaParser {
                     // New Block detection:
                     if (block == null) {
                         block = new CodeBlock();
+                        block.hasParent = (parent != null);
                         block.start = i - word.value.length();
                     }
 
@@ -258,7 +259,7 @@ public class JavaParser {
                         // Set block type:
                         block.type = getBlockType(block);
                         // Search block name (function or classname) :
-                        setBlockName(block);
+                        setBlockNameAndProperties(block);
 
                         // System.out.println(block.subCode);
                         block.subBlocks = this.parse(block.subCode, block, null);
@@ -267,7 +268,7 @@ public class JavaParser {
                         // Set block type:
                         block.type = getBlockType(block);
                         // Search block name (function or classname) :
-                        setBlockName(block);
+                        setBlockNameAndProperties(block);
                     }
 
                     // Detect 'constructor':
@@ -375,32 +376,61 @@ public class JavaParser {
         return false;
     }
 
-    private void setBlockName(CodeBlock block) {
-        if (block.type == CodeBlock.BlockType.Class || block.type == CodeBlock.BlockType.Function
-                || block.type == CodeBlock.BlockType.Interface) {
-            block.name = getDefaultBlockName(block);
+    private void setBlockNameAndProperties(CodeBlock block) {
+        if (block.type == CodeBlock.BlockType.Class || block.type == CodeBlock.BlockType.Interface) {
+            parseClassName(block);
+        } else if (block.type == CodeBlock.BlockType.Function) {
+            parseFunction(block);
+        // } else if (block.type == CodeBlock.BlockType.Attribute) {
+        //    parseFunction(block);
         } else if (block.type == CodeBlock.BlockType.Package || block.type == CodeBlock.BlockType.Import) {
-            block.name = getPackageOrImportName(block);
+            parsePackageOrImportName(block);
         }
     }
 
-    private String getPackageOrImportName(CodeBlock block) {
+    private void parseFunction(CodeBlock block) {
+        String typeName = null;
+        for(CodeString word : block.words) {
+            if (isBreakCharacter(word.value)) break;
+            parseModifier(block, word.value);
+            if (!word.isInstruction && !TextUtils.isEmpty(word.value.trim())) {
+                if (typeName == null) {
+                    typeName = word.value;
+                } else {
+                    block.name = word.value;
+                    block.returnType = typeName;
+                    return;
+                }
+            }
+        }
+        block.name = typeName;
+        block.returnType = null;
+    }
+
+    private void parsePackageOrImportName(CodeBlock block) {
         StringBuilder sb = new StringBuilder();
         for(CodeString word : block.words) {
-            if (!TextUtils.isEmpty(word.value.trim()) && !isBreakCharacter(word.value) && !isBreakCharacter(word.value))
+            if (isBreakCharacter(word.value)) break;
+            parseModifier(block, word.value);
+            if (!TextUtils.isEmpty(word.value.trim()) && !isBreakCharacter(word.value))
                 sb.append(word.value);
         }
-        return sb.toString();
+        block.name = sb.toString();
     }
 
-    private String getDefaultBlockName(CodeBlock block) {
+    private void parseModifier(CodeBlock block, String word) {
+        if (sPublic.equals(word)) block.modifier = CodeBlock.Modifier.Public;
+        if (sPrivate.equals(word)) block.modifier = CodeBlock.Modifier.Private;
+        if (sProtected.equals(word)) block.modifier = CodeBlock.Modifier.Protected;
+    }
+
+    private void parseClassName(CodeBlock block) {
         for(CodeString word : block.words) {
-            if (!word.isInstruction && !word.isType
-                    && !TextUtils.isEmpty(word.value.trim())
-                    && !isBreakCharacter(word.value))
-                return word.value;
+            if (isBreakCharacter(word.value)) break;
+            parseModifier(block, word.value);
+            if (!word.isInstruction && !word.isType && !TextUtils.isEmpty(word.value.trim()))
+                block.name = word.value;
         }
-        return null;
     }
 
     private CodeString getFirstWord(ArrayList<CodeString> words) {
