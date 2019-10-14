@@ -20,6 +20,11 @@ public class CodeBlock {
     public String code;
 
     /**
+     * Sub source code (nested by function, class...)
+     */
+    public String subCode;
+
+    /**
      * Black name for Class or function
      */
     public String name;

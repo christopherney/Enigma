@@ -253,20 +253,28 @@ public class JavaParser {
                         for (j = 0; j < block.code.length(); j++) {
                             if (block.code.charAt(j) == cCurlyBracketOpen) break;
                         }
-                        String subCode = block.code.substring(j + 1, block.code.length() - 1);
-                        // System.out.println(subCode);
-                        block.subBlocks = this.parse(subCode, block, null);
+                        block.subCode = block.code.substring(j + 1, block.code.length() - 1);
+
+                        // Set block type:
+                        block.type = getBlockType(block);
+                        // Search block name (function or classname) :
+                        setBlockName(block);
+
+                        // System.out.println(block.subCode);
+                        block.subBlocks = this.parse(block.subCode, block, null);
+
+                    } else {
+                        // Set block type:
+                        block.type = getBlockType(block);
+                        // Search block name (function or classname) :
+                        setBlockName(block);
                     }
 
-                    // Set block type:
-                    block.type = getBlockType(block);
-
-                    // Search block name (function or classname) :
-                    if (block.type == CodeBlock.BlockType.Class || block.type == CodeBlock.BlockType.Function
-                            || block.type == CodeBlock.BlockType.Interface) {
-                        block.name = getBlockName(block);
-                    } else if (block.type == CodeBlock.BlockType.Package || block.type == CodeBlock.BlockType.Import) {
-                        block.name = getPackageOrImportName(block);
+                    // Detect 'constructor':
+                    if (block.type == CodeBlock.BlockType.Function && parent != null
+                            && parent.type == CodeBlock.BlockType.Class
+                            && block.name != null && block.name.equals(parent.name)) {
+                        block.type = CodeBlock.BlockType.Constructor;
                     }
 
                     blocks.add(block);
@@ -282,7 +290,7 @@ public class JavaParser {
                 if (curChar.equals(cSlash) && prevChar.equals(cStar))
                     currentBlock = CodeBlock.BlockType.Undefined;
             } else if (currentBlock == CodeBlock.BlockType.Annotation) {
-                if (isEndAnnotation(currentBlock, curChar, nextNoneEmptyChar,counterParenthesis))
+                if (isEndAnnotation(currentBlock, curChar, nextNoneEmptyChar, counterParenthesis))
                     currentBlock = CodeBlock.BlockType.Undefined;
             }
 
@@ -367,6 +375,15 @@ public class JavaParser {
         return false;
     }
 
+    private void setBlockName(CodeBlock block) {
+        if (block.type == CodeBlock.BlockType.Class || block.type == CodeBlock.BlockType.Function
+                || block.type == CodeBlock.BlockType.Interface) {
+            block.name = getDefaultBlockName(block);
+        } else if (block.type == CodeBlock.BlockType.Package || block.type == CodeBlock.BlockType.Import) {
+            block.name = getPackageOrImportName(block);
+        }
+    }
+
     private String getPackageOrImportName(CodeBlock block) {
         StringBuilder sb = new StringBuilder();
         for(CodeString word : block.words) {
@@ -376,7 +393,7 @@ public class JavaParser {
         return sb.toString();
     }
 
-    private String getBlockName(CodeBlock block) {
+    private String getDefaultBlockName(CodeBlock block) {
         for(CodeString word : block.words) {
             if (!word.isInstruction && !word.isType
                     && !TextUtils.isEmpty(word.value.trim())
@@ -394,7 +411,8 @@ public class JavaParser {
     }
 
     private CodeBlock.BlockType getBlockType(CodeBlock block) {
-        if (block.subBlocks != null && block.subBlocks.size() > 0) {
+        // has nested code (function, condition, class...)
+        if (!TextUtils.isEmpty(block.subCode)) {
             CodeString firstWord = getFirstWord(block.words);
             if (firstWord.value.startsWith(String.valueOf(cAnnotation))) return CodeBlock.BlockType.Annotation;
             if (firstWord.value.equals(sIf) || firstWord.value.equals(sElse) || firstWord.value.equals(sSwitch))

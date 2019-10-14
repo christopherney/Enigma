@@ -139,6 +139,45 @@ public class TestJavaParser {
                 "    }\n" +
                 "}\n";
 
+        code = "package com.proto.helloworld.helpers;\n" +
+                "\n" +
+                "import android.annotation.SuppressLint;\n" +
+                "import android.util.Log;\n" +
+                "\n" +
+                "/**\n" +
+                " * Utilities\n" +
+                " * @Author Christopher Ney\n" +
+                " */\n" +
+                "public class Utils {\n" +
+                "\n" +
+                "    private static final String TAG = \"Utils\";\n" +
+                "\n" +
+                "    // Test line comment\n" +
+                "\n" +
+                "    public Utils() {\n" +
+                "        Log.d(TAG, \"initialize utils\");\n" +
+                "    }\n" +
+                "\n" +
+                "    public static int addition(int a, int b) {\n" +
+                "        return a + b;\n" +
+                "    }\n" +
+                "\n" +
+                "    @SuppressWarnings(\"unchecked\")\n" +
+                "    public static String addQuotes(String value) {\n" +
+                "        return \"\\\"\" + value + \"\\\"\";\n" +
+                "    }\n" +
+                "\n" +
+                "    @SuppressLint(\"NewApi\") public static String cleanQuote(String value) {\n" +
+                "        // Remove quotes:\n" +
+                "        return value.replace(\"\\\"\", \"\");\n" +
+                "    }\n" +
+                "\n" +
+                "    @Override\n" +
+                "    public String toString() {\n" +
+                "        return super.toString();\n" +
+                "    }\n" +
+                "}\n";
+
         try {
             JavaParser parser = new JavaParser();
             parser.parse(code);
