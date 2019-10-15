@@ -122,12 +122,14 @@ public class JavaParser {
 
         JavaCode javaClass =  new JavaCode(blocks, strings);
         // TEST:
+        /*
         for (CodeBlock b : javaClass.getAllBlocks()) {
             System.out.println(b.toString());
         }
         for (CodeString s : javaClass.getStringValues()) {
             System.out.println(s.toString());
         }
+        */
         return javaClass;
     }
 

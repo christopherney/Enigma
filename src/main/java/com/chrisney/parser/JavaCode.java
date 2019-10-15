@@ -108,6 +108,21 @@ public class JavaCode {
         return result;
     }
 
+    public void addImport(String packageName) {
+        CodeBlock block = new CodeBlock();
+        block.type = CodeBlock.BlockType.Import;
+        block.code = "import " + packageName + ";";
+        addBlockInPosition(block, InsertPosition.Before, CodeBlock.BlockType.Class);
+    }
+
+    private enum InsertPosition {
+        Before,
+        After
+    }
+    private void addBlockInPosition(CodeBlock block, InsertPosition position, CodeBlock.BlockType type) {
+        // @TODO  !!!
+    }
+
     public String toCode() {
         StringBuilder sb = new StringBuilder();
         for(CodeBlock block : getAllBlocks()) {
