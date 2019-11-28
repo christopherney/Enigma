@@ -97,16 +97,16 @@ public class EnigmaTask extends AbstractTask {
 
         String contents = FileUtils.readFileToString(srcFile, "UTF-8");
 
-        // contents = codeParser.encode(this.hash, contents, this.injectFakeKeys);
+        String contentSecured = codeParser.encode(this.hash, contents, this.injectFakeKeys);
 
         // @TODO TESTS !!!
         JavaParser p = new JavaParser();
         JavaCode code = p.parse(contents);
         code.addImport(InjectCodeTask.PACKAGE_NAME + "." + InjectCodeTask.CLASS_NAME);
-       //  contents = code.toCode();
+       //  contentSecured = code.toCode();
         // System.out.println(contents);
 
-        FileUtils.writeStringToFile(srcFile, contents, "UTF-8");
+        FileUtils.writeStringToFile(srcFile, contentSecured, "UTF-8");
 
         System.out.println("\uD83D\uDD10 " + srcFile.getName() + " encrypted");
     }

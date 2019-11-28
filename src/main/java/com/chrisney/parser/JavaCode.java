@@ -1,7 +1,10 @@
 package com.chrisney.parser;
 
+import com.chrisney.utils.AESUtils;
 import com.chrisney.utils.Utils;
+import org.gradle.api.DefaultTask;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 /**
@@ -118,6 +121,10 @@ public class JavaCode {
         return result;
     }
 
+    /**
+     * Add a package name import.
+     * @param packageName Package name to import
+     */
     public void addImport(String packageName) {
 
         String code = "import " + packageName + ";";
@@ -129,6 +136,11 @@ public class JavaCode {
         addBlockAtPosition(this.codeBlocks, blockImport, InsertPosition.AtTheEnd, CodeBlock.BlockType.Import);
     }
 
+    /**
+     * Add an attribute in the class
+     * @param attributeCode Attribute to add
+     * @throws ClassNotFoundException No Class found in the soucre code
+     */
     public void addAttribute(String attributeCode) throws ClassNotFoundException {
         addAttribute(attributeCode, null);
     }
@@ -151,6 +163,11 @@ public class JavaCode {
         }
     }
 
+    /**
+     * Add a function into the class
+     * @param functionCode Function to add
+     * @throws ClassNotFoundException
+     */
     public void addFunction(String functionCode) throws ClassNotFoundException {
         addFunction(functionCode, null);
     }
@@ -214,6 +231,69 @@ public class JavaCode {
         return false;
     }
 
+    public String stringToSecureFormat(String value, String key, String functionName, DefaultTask encryptTask) throws Exception {
+        StringBuilder builder = new StringBuilder();
+        value = value.replace("\\\"", "\"");
+        value = value.replace("\\\\", "\\");
+
+        String encrypted = encryptString(key, value, encryptTask);
+
+        if (encryptTask == null) {
+            byte[] enc = AESUtils.toByte(encrypted);
+            builder.append(functionName);
+            builder.append("(new byte[]");
+            builder.append(bytesToCode(enc));
+            builder.append(")");
+        } else {
+            builder.append(functionName);
+            builder.append("(\"");
+            builder.append(encrypted);
+            builder.append("\")");
+        }
+
+        return builder.toString();
+    }
+
+    /**
+     * Encrypt string value
+     * @param key Secrete key
+     * @param value String value
+     * @param encryptTask Experimental !
+     * @return Encrypted string
+     * @throws Exception Missing encryption secrete key
+     */
+    private String encryptString(String key, String value, DefaultTask encryptTask) throws Exception {
+        // System.out.println(value);
+        if (encryptTask == null) {
+            if (key == null) throw new Exception("Hash Key undefined!");
+            return AESUtils.encrypt(key, value);
+        } else {
+            Method encryptMethod = encryptTask.getClass().getMethod("encrypt", String.class);
+            return (String) encryptMethod.invoke(encryptTask, value);
+        }
+    }
+
+    /**
+     * Convert bytes value, to JAVA code format
+     * @param bytes Bytes value
+     * @return JAVA code
+     */
+    private String bytesToCode(byte[] bytes) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("{");
+        for (int i = 0; i < bytes.length; i++) {
+            byte b = bytes[i];
+            builder.append(b);
+            if (i < bytes.length - 1) builder.append(", ");
+        }
+        builder.append("}");
+        return builder.toString();
+    }
+
+    /**
+     * Source code formatted
+     * @return Print the source code formatted
+     */
     public String toCode() {
         StringBuilder sb = new StringBuilder();
         for(CodeBlock block : getAllBlocks()) {
