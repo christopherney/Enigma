@@ -1,9 +1,28 @@
 import com.chrisney.parser.JavaCode;
 import com.chrisney.parser.JavaParser;
+import com.chrisney.utils.Utils;
+import org.junit.Assert;
+
+import java.util.ArrayList;
 
 public class TestJavaParser {
 
     public static void main(String[] args) {
+        testInsertArray();
+        testJavaParser();
+    }
+
+    public static void testInsertArray() {
+
+        ArrayList array1 = Utils.toArrayList(new Integer[]{0, 1, 2, 3, 4, 5, 6});
+        ArrayList array2 = Utils.toArrayList(new Integer[]{0, 1, 2, 3, 99, 4, 5, 6});
+
+        Utils.insertInArray(array1, 4, 99);
+
+        Assert.assertEquals(array1, array2);
+    }
+
+    public static void testJavaParser() {
         String code;
         code =  "public class AESUtils {\n" +
                 "\n" +
@@ -181,10 +200,19 @@ public class TestJavaParser {
         try {
             JavaParser parser = new JavaParser();
             JavaCode c = parser.parse(code);
+
             String stringCode = c.toCode();
+            System.out.println(stringCode);
+
+            c.addImport("com.example.package.name");
+            c.addFunction("public static boolean test(int value) { return value > 0; }");
+            c.addAttribute("public String mValueTest = \"Hello World\";");
+
+            stringCode = c.toCode();
             System.out.println(stringCode);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
+
 }

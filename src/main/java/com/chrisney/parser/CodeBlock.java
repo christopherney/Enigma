@@ -25,7 +25,7 @@ public class CodeBlock {
     public String subCode;
 
     /**
-     * Black name for Class or function
+     * Black name for Class or function or Annotation
      */
     public String name;
 

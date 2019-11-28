@@ -119,18 +119,7 @@ public class JavaParser {
     public JavaCode parse(String sourceCode) {
         ArrayList<CodeString> strings = new ArrayList<>();
         ArrayList<CodeBlock> blocks = this.parse(sourceCode, null, strings);
-
-        JavaCode javaClass =  new JavaCode(blocks, strings);
-        // TEST:
-        /*
-        for (CodeBlock b : javaClass.getAllBlocks()) {
-            System.out.println(b.toString());
-        }
-        for (CodeString s : javaClass.getStringValues()) {
-            System.out.println(s.toString());
-        }
-        */
-        return javaClass;
+        return new JavaCode(blocks, strings);
     }
 
     /**
@@ -261,7 +250,7 @@ public class JavaParser {
                         // Set block type:
                         block.type = getBlockType(block);
                         // Search block name (function or classname) :
-                        setBlockNameAndProperties(block);
+                        parseBlockProperties(block);
 
                         // System.out.println(block.subCode);
                         block.subBlocks = this.parse(block.subCode, block, null);
@@ -270,7 +259,7 @@ public class JavaParser {
                         // Set block type:
                         block.type = getBlockType(block);
                         // Search block name (function or classname) :
-                        setBlockNameAndProperties(block);
+                        parseBlockProperties(block);
                     }
 
                     // Detect 'constructor':
@@ -365,32 +354,47 @@ public class JavaParser {
      * @param word Keyword
      * @return True is the keyword is a Java instruction
      */
-    private boolean isInstruction(String word) {
+    private static boolean isInstruction(String word) {
         for (String k : keywords) {
             if (k.equalsIgnoreCase(word)) return true;
         }
         return false;
     }
 
-    private boolean isBreakCharacter(String word) {
+    private static boolean isBreakCharacter(String word) {
         if (word.length() == 1)
             return TextUtils.inCharactersList(charBreaks, word.charAt(0));
         return false;
     }
 
-    private void setBlockNameAndProperties(CodeBlock block) {
+    private static void parseBlockProperties(CodeBlock block) {
         if (block.type == CodeBlock.BlockType.Class || block.type == CodeBlock.BlockType.Interface) {
             parseClassName(block);
         } else if (block.type == CodeBlock.BlockType.Function) {
             parseFunction(block);
         // } else if (block.type == CodeBlock.BlockType.Attribute) {
-        //    parseFunction(block);
+            // @TODO : reuse parse function ?
+        //    parseAttribute(block);
         } else if (block.type == CodeBlock.BlockType.Package || block.type == CodeBlock.BlockType.Import) {
             parsePackageOrImportName(block);
+        } else if (block.type == CodeBlock.BlockType.Annotation) {
+            parseAnnotation(block);
         }
     }
 
-    private void parseFunction(CodeBlock block) {
+    private static void parseAnnotation(CodeBlock block) {
+        String annotationName = null;
+        String at = String.valueOf(cAnnotation);
+        for(CodeString word : block.words) {
+            if (word.value.startsWith(at)) {
+                annotationName = word.value.replace(at, "");
+                break;
+            }
+        }
+        block.name = annotationName;
+    }
+
+    private static void parseFunction(CodeBlock block) {
         String typeName = null;
         for(CodeString word : block.words) {
             if (isBreakCharacter(word.value)) break;
@@ -409,24 +413,30 @@ public class JavaParser {
         block.returnType = null;
     }
 
-    private void parsePackageOrImportName(CodeBlock block) {
+    private static void parsePackageOrImportName(CodeBlock block) {
         StringBuilder sb = new StringBuilder();
         for(CodeString word : block.words) {
             if (isBreakCharacter(word.value)) break;
-            parseModifier(block, word.value);
-            if (!TextUtils.isEmpty(word.value.trim()) && !isBreakCharacter(word.value))
+            if (!TextUtils.isEmpty(word.value.trim()) && !isBreakCharacter(word.value) && !isInstruction(word.value))
                 sb.append(word.value);
         }
         block.name = sb.toString();
     }
 
-    private void parseModifier(CodeBlock block, String word) {
+    private boolean hasModifier(ArrayList<CodeString> words) {
+        if (words == null) return false;
+        CodeString firstWord = getFirstNoneEmptyWord(words);
+        if (firstWord == null) return false;
+        return (sPublic.equals(firstWord.value) || sPrivate.equals(firstWord.value) || sProtected.equals(firstWord.value));
+    }
+
+    private static void parseModifier(CodeBlock block, String word) {
         if (sPublic.equals(word)) block.modifier = CodeBlock.Modifier.Public;
         if (sPrivate.equals(word)) block.modifier = CodeBlock.Modifier.Private;
         if (sProtected.equals(word)) block.modifier = CodeBlock.Modifier.Protected;
     }
 
-    private void parseClassName(CodeBlock block) {
+    private static void parseClassName(CodeBlock block) {
         for(CodeString word : block.words) {
             if (isBreakCharacter(word.value)) break;
             parseModifier(block, word.value);
@@ -435,7 +445,7 @@ public class JavaParser {
         }
     }
 
-    private CodeString getFirstWord(ArrayList<CodeString> words) {
+    private CodeString getFirstNoneEmptyWord(ArrayList<CodeString> words) {
         for (CodeString word : words) {
             if (!TextUtils.isEmpty(word.value.trim())) return word;
         }
@@ -445,7 +455,7 @@ public class JavaParser {
     private CodeBlock.BlockType getBlockType(CodeBlock block) {
         // has nested code (function, condition, class...)
         if (!TextUtils.isEmpty(block.subCode)) {
-            CodeString firstWord = getFirstWord(block.words);
+            CodeString firstWord = getFirstNoneEmptyWord(block.words);
             if (firstWord.value.startsWith(String.valueOf(cAnnotation))) return CodeBlock.BlockType.Annotation;
             if (firstWord.value.equals(sIf) || firstWord.value.equals(sElse) || firstWord.value.equals(sSwitch))
                 return CodeBlock.BlockType.Condition;
@@ -473,7 +483,7 @@ public class JavaParser {
             }
         }
 
-        return CodeBlock.BlockType.LineOfCode;
+        return (hasModifier(block.words)) ? CodeBlock.BlockType.Attribute : CodeBlock.BlockType.LineOfCode;
     }
 
 }
