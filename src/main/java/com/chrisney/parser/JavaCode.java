@@ -127,7 +127,7 @@ public class JavaCode {
      */
     public void addImport(String packageName) {
 
-        String code = "import " + packageName + ";";
+        String code = "\nimport " + packageName.trim() + ";";
 
         JavaParser javaParser = new JavaParser();
         JavaCode javaCode = javaParser.parse(code);
@@ -154,7 +154,7 @@ public class JavaCode {
         if (blockClass == null) throw new ClassNotFoundException("Class '" + className + "' not found!");
 
         JavaParser javaParser = new JavaParser();
-        JavaCode javaCode = javaParser.parse(attributeCode);
+        JavaCode javaCode = javaParser.parse("\n\n" + attributeCode.trim());
         CodeBlock block = javaCode.getAllBlocks().get(0);
         block.hasParent = true;
 
@@ -181,7 +181,7 @@ public class JavaCode {
         if (blockClass == null) throw new ClassNotFoundException("Class '" + className + "' not found!");
 
         JavaParser javaParser = new JavaParser();
-        JavaCode javaCode = javaParser.parse(functionCode);
+        JavaCode javaCode = javaParser.parse("\n\n" + functionCode.trim());
         CodeBlock block = javaCode.getFunctions().get(0);
         block.hasParent = true;
 

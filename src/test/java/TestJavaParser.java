@@ -1,3 +1,4 @@
+import com.chrisney.parser.CodeBlock;
 import com.chrisney.parser.JavaCode;
 import com.chrisney.parser.JavaParser;
 import com.chrisney.utils.Utils;
@@ -8,8 +9,17 @@ import java.util.ArrayList;
 public class TestJavaParser {
 
     public static void main(String[] args) {
+        testImportParser();
         testInsertArray();
         testJavaParser();
+    }
+
+    public static void testImportParser() {
+        String code = "\nimport com.chrisney.parser.JavaParser;";
+        JavaParser javaParser = new JavaParser();
+        JavaCode javaCode = javaParser.parse(code);
+        CodeBlock blockImport = javaCode.getAllBlocks().get(0);
+        System.out.print(blockImport);
     }
 
     public static void testInsertArray() {
@@ -209,7 +219,7 @@ public class TestJavaParser {
             c.addAttribute("public String mValueTest = \"Hello World\";");
 
             stringCode = c.toCode(false);
-            //System.out.println(stringCode);
+            System.out.println(stringCode);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

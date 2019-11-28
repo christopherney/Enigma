@@ -191,8 +191,11 @@ public class JavaParser {
             if (word == null && !TextUtils.inCharactersList(charBreaks, curChar)) {
                 word = new CodeString(i);
 
-            } else if (TextUtils.isEmptyChar(curChar) || TextUtils.inCharactersList(charBreaks, curChar) ||
-                    isEndBlockComment(currentBlock, curChar, prevChar)) {
+            }
+            if (TextUtils.isEmptyChar(curChar) || TextUtils.inCharactersList(charBreaks, curChar) ||
+                    isEndBlockComment(currentBlock, curChar, prevChar)
+                    // || (word != null && TextUtils.isEmptyChar(source.charAt(word.start)) && !TextUtils.isEmptyChar(curChar))
+            ) {
 
                 // End of current word, then create word object:
                 if (word != null) {
@@ -213,7 +216,7 @@ public class JavaParser {
                     }
 
                     // Add word to current block:
-                    block.words.add(word);
+                    if (!word.value.isEmpty()) block.words.add(word);
                 }
 
                 // Start new word:
@@ -222,7 +225,7 @@ public class JavaParser {
                 word.value = String.valueOf(curChar);
 
                 // Add words to current block:
-                if (block != null) block.words.add(word);
+                if (block != null && !word.value.isEmpty()) block.words.add(word);
                 word = null;
             }
 
@@ -455,9 +458,13 @@ public class JavaParser {
         }
     }
 
+    private boolean isEmptyWord(CodeString word) {
+        return word.value == null || TextUtils.isEmpty(word.value.trim());
+    }
+
     private CodeString getFirstNoneEmptyWord(ArrayList<CodeString> words) {
         for (CodeString word : words) {
-            if (!TextUtils.isEmpty(word.value.trim())) return word;
+            if (!isEmptyWord(word)) return word;
         }
         return null;
     }
@@ -479,6 +486,8 @@ public class JavaParser {
             return CodeBlock.BlockType.Function;
         } else {
             for (CodeString word : block.words) {
+                if (isEmptyWord(word)) continue;
+
                 if (word.value.equals(sPackage)) return CodeBlock.BlockType.Package;
                 if (word.value.equals(sImport)) return CodeBlock.BlockType.Import;
                 if (word.value.equals(sStatic)) return CodeBlock.BlockType.Attribute;
