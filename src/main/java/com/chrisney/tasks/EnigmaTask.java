@@ -104,6 +104,8 @@ public class EnigmaTask extends AbstractTask {
         JavaCode code = p.parse(contents);
         code.addImport(InjectCodeTask.PACKAGE_NAME + "." + InjectCodeTask.CLASS_NAME);
 
+        if (injectFakeKeys) code.injectFakeKeys();
+
         String contentSecured = code.toCode();
         // System.out.println(contentSecured);
 

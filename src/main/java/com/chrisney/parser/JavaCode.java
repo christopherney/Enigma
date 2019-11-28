@@ -1,6 +1,7 @@
 package com.chrisney.parser;
 
 import com.chrisney.utils.AESUtils;
+import com.chrisney.utils.TextUtils;
 import com.chrisney.utils.Utils;
 import org.gradle.api.DefaultTask;
 
@@ -21,6 +22,10 @@ public class JavaCode {
      * All String values
      */
     private ArrayList<CodeString> codeStrings;
+
+
+    private static final String FAKE_KEY_CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789qwertyuiopasdfghjklzxcvbnm#$*!?";
+    private static final String FAKE_PARAM_CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
 
     /**
      * Constructor
@@ -160,7 +165,7 @@ public class JavaCode {
         CodeBlock block = javaCode.getAllBlocks().get(0);
         block.hasParent = true;
 
-        if (!addBlockAtPosition(blockClass.subBlocks, block, InsertPosition.RightAfter, CodeBlock.BlockType.Attribute)) {
+        if (!addBlockAtPosition(blockClass.subBlocks, block, InsertPosition.AtTheEnd, CodeBlock.BlockType.Attribute)) {
             Utils.insertInArray(blockClass.subBlocks, 0, block);
         }
     }
@@ -231,6 +236,45 @@ public class JavaCode {
             }
         }
         return false;
+    }
+
+    public void injectFakeKeys() {
+        try {
+            ArrayList<CodeBlock> functions = getFunctions();
+            if (functions.size() > 0) {
+                String fakeParamName = TextUtils.getRandomString(10, FAKE_PARAM_CHARACTERS);
+
+                String fakeAttribute = getFakeAttribute(fakeParamName);
+                addAttribute(fakeAttribute);
+
+                CodeBlock fakeCode = getFakeCode(fakeParamName);
+                CodeBlock blockFunction = functions.get(0);
+
+                CodeBlock lastLineOfCode = blockFunction.subBlocks.get(blockFunction.subBlocks.size() - 1);
+                if (lastLineOfCode.type == CodeBlock.BlockType.Return) {
+                    Utils.insertInArray(blockFunction.subBlocks, 0, fakeCode);
+                } else {
+                    blockFunction.subBlocks.add(fakeCode);
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private CodeBlock getFakeCode(String paramName) {
+        String code = "\n        if (" + paramName + ".isEmpty()) " + paramName + ".getClass().toString();";
+        JavaParser javaParser = new JavaParser();
+        JavaCode javaCode = javaParser.parse(code);
+        CodeBlock block = javaCode.getAllBlocks().get(0);
+        block.hasParent = true;
+        return block;
+    }
+
+    private String getFakeAttribute(String paramName) {
+        int sizeValue = Utils.getRandomNumberInRange(10, 30);
+        String randomValue = TextUtils.getRandomString(sizeValue, FAKE_KEY_CHARACTERS);
+        return "public static final String " + paramName + " = \"" + randomValue + "\";";
     }
 
     public String stringToSecureFormat(String value, String key, String functionName, DefaultTask encryptTask) throws Exception {

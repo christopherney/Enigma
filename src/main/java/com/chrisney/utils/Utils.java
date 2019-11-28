@@ -14,7 +14,7 @@ public class Utils {
     }
 
     public static void insertInArray(ArrayList arrayList, int index, Object value) {
-        for (int i = arrayList.size() - 1; i > 0; i--) {
+        for (int i = arrayList.size() - 1; i >= 0; i--) {
             Object v =  arrayList.get(i);
             if (i < arrayList.size() - 1) {
                 arrayList.set(i + 1, v);

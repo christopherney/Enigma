@@ -218,6 +218,8 @@ public class TestJavaParser {
             c.addFunction("public static boolean test(int value) { return value > 0; }");
             c.addAttribute("public String mValueTest = \"Hello World\";");
 
+            c.injectFakeKeys();
+
             stringCode = c.toCode(false);
             System.out.println(stringCode);
         } catch (Exception ex) {
