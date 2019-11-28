@@ -133,7 +133,9 @@ public class JavaCode {
         JavaCode javaCode = javaParser.parse(code);
         CodeBlock blockImport = javaCode.getImports().get(0);
 
-        addBlockAtPosition(this.codeBlocks, blockImport, InsertPosition.AtTheEnd, CodeBlock.BlockType.Import);
+        if (!addBlockAtPosition(this.codeBlocks, blockImport, InsertPosition.AtTheEnd, CodeBlock.BlockType.Import)) {
+            addBlockAtPosition(this.codeBlocks, blockImport, InsertPosition.RightAfter, CodeBlock.BlockType.Package);
+        }
     }
 
     /**
@@ -154,7 +156,7 @@ public class JavaCode {
         if (blockClass == null) throw new ClassNotFoundException("Class '" + className + "' not found!");
 
         JavaParser javaParser = new JavaParser();
-        JavaCode javaCode = javaParser.parse("\n\n" + attributeCode.trim());
+        JavaCode javaCode = javaParser.parse("\n\n    " + attributeCode.trim());
         CodeBlock block = javaCode.getAllBlocks().get(0);
         block.hasParent = true;
 
@@ -181,7 +183,7 @@ public class JavaCode {
         if (blockClass == null) throw new ClassNotFoundException("Class '" + className + "' not found!");
 
         JavaParser javaParser = new JavaParser();
-        JavaCode javaCode = javaParser.parse("\n\n" + functionCode.trim());
+        JavaCode javaCode = javaParser.parse("\n\n    " + functionCode.trim());
         CodeBlock block = javaCode.getFunctions().get(0);
         block.hasParent = true;
 
@@ -291,7 +293,16 @@ public class JavaCode {
     }
 
     /**
+     * Source code
+     * @return Print the source code
+     */
+    public String toCode() {
+        return toCode(false);
+    }
+
+    /**
      * Source code formatted
+     * @param formatted Option to format output source code
      * @return Print the source code formatted
      */
     public String toCode(boolean formatted) {

@@ -124,8 +124,10 @@ public class CodeBlock {
             if (formatted && (code.endsWith(";") || code.endsWith("*/") || code.endsWith(")"))) sb.append("\n");
 
         } else {
+            boolean isFunctionOrClass = code.trim().endsWith("}");
+
             // Print function (or class) signature:
-            if (code.endsWith("}")) {
+            if (isFunctionOrClass) {
                 int i = 0;
                 while (code.charAt(i) != '{') {
                     sb.append(code.charAt(i));
@@ -141,7 +143,7 @@ public class CodeBlock {
             }
 
             // Close function (or class):
-            if (code.trim().endsWith("}")) {
+            if (isFunctionOrClass) {
                 if (formatted) {
                     if (hasParent) sb.append(sbTab.toString());
                     sb.append("}\n\n");
@@ -155,6 +157,9 @@ public class CodeBlock {
                     String end = code.substring(i + 1);
                     sb.append(end);
                 }
+
+                // End Of File
+                if (!hasParent) sb.append("\n");
             }
         }
         return sb.toString();
