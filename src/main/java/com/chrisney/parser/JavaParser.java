@@ -118,7 +118,7 @@ public class JavaParser {
      */
     public JavaCode parse(String sourceCode) {
         ArrayList<CodeString> strings = new ArrayList<>();
-        ArrayList<CodeBlock> blocks = this.parse(sourceCode, null, strings);
+        ArrayList<CodeBlock> blocks = this.parse(sourceCode, null, strings, 0);
         return new JavaCode(blocks, strings, sourceCode);
     }
 
@@ -128,7 +128,7 @@ public class JavaParser {
      * @param parent Parent block (optional)
      * @return Code blocks
      */
-    private ArrayList<CodeBlock> parse(String source, CodeBlock parent, ArrayList<CodeString> strings) {
+    private ArrayList<CodeBlock> parse(String source, CodeBlock parent, ArrayList<CodeString> strings, int offset) {
 
         ArrayList<CodeBlock> blocks = new ArrayList<>();
 
@@ -194,7 +194,6 @@ public class JavaParser {
             }
             if (TextUtils.isEmptyChar(curChar) || TextUtils.inCharactersList(charBreaks, curChar) ||
                     isEndBlockComment(currentBlock, curChar, prevChar)
-                    // || (word != null && TextUtils.isEmptyChar(source.charAt(word.start)) && !TextUtils.isEmptyChar(curChar))
             ) {
 
                 // End of current word, then create word object:
@@ -211,6 +210,7 @@ public class JavaParser {
                     // New Block detection:
                     if (block == null) {
                         block = new CodeBlock();
+                        block.offset = offset;
                         block.hasParent = (parent != null);
                         block.start = i - word.value.length();
                     }
@@ -248,7 +248,9 @@ public class JavaParser {
                         for (j = 0; j < block.code.length(); j++) {
                             if (block.code.charAt(j) == cCurlyBracketOpen) break;
                         }
-                        block.subCode = block.code.substring(j + 1, block.code.length() - 1);
+                        int subCodeStart = j + 1;
+                        int subCodeEnd = block.code.length() - 1;
+                        block.subCode = block.code.substring(subCodeStart, subCodeEnd);
 
                         // Set block type:
                         block.type = getBlockType(block);
@@ -256,7 +258,7 @@ public class JavaParser {
                         parseBlockProperties(block);
 
                         // System.out.println(block.subCode);
-                        block.subBlocks = this.parse(block.subCode, block, null);
+                        block.subBlocks = this.parse(block.subCode, block, null, block.start + subCodeStart);
 
                     } else {
                         // Set block type:

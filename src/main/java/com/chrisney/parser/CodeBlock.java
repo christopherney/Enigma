@@ -61,6 +61,11 @@ public class CodeBlock {
      */
     public boolean hasParent = false;
 
+    /**
+     * Start/End offset
+     */
+    public int offset = 0;
+
     public enum Modifier {
         Public,
         Private,
@@ -97,7 +102,7 @@ public class CodeBlock {
     public String toString() {
         String m = "";
         if (modifier != null) m = Modifier.Public + ": ";
-        return "[" + m + start + ", " + end + "] (" + type + ":" + name + ") " + wordsToString();
+        return "[" + m + (start + offset) + ", " + (end + offset) + "] (" + type + ":" + name + ") " + wordsToString();
     }
 
     public String toCode() {
