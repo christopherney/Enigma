@@ -188,7 +188,7 @@ public class JavaParser {
             }
 
             // Start new word:
-            if (word == null && !TextUtils.isEmptyChar(curChar) && !TextUtils.inCharactersList(charBreaks, curChar)) {
+            if (word == null && !TextUtils.inCharactersList(charBreaks, curChar)) {
                 word = new CodeString(i);
 
             } else if (TextUtils.isEmptyChar(curChar) || TextUtils.inCharactersList(charBreaks, curChar) ||
@@ -249,7 +249,7 @@ public class JavaParser {
 
                         // Set block type:
                         block.type = getBlockType(block);
-                        // Search block name (function or classname) :
+                        // Search block name and properties:
                         parseBlockProperties(block);
 
                         // System.out.println(block.subCode);
@@ -258,7 +258,7 @@ public class JavaParser {
                     } else {
                         // Set block type:
                         block.type = getBlockType(block);
-                        // Search block name (function or classname) :
+                        // Search block name and properties:
                         parseBlockProperties(block);
                     }
 
@@ -267,6 +267,16 @@ public class JavaParser {
                             && parent.type == CodeBlock.BlockType.Class
                             && block.name != null && block.name.equals(parent.name)) {
                         block.type = CodeBlock.BlockType.Constructor;
+                    }
+
+                    // Detect empty spaces (line breaks...)
+                    if (blocks.size() > 0) {
+                        CodeBlock lastBlock = blocks.get(blocks.size() - 1);
+                        CodeBlock emptyBlock = new CodeBlock();
+                        emptyBlock.start = lastBlock.end;
+                        emptyBlock.end = block.start;
+                        emptyBlock.code = source.substring(emptyBlock.start, emptyBlock.end);
+                        System.out.print(emptyBlock.code);
                     }
 
                     blocks.add(block);

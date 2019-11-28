@@ -201,15 +201,15 @@ public class TestJavaParser {
             JavaParser parser = new JavaParser();
             JavaCode c = parser.parse(code);
 
-            String stringCode = c.toCode();
+            String stringCode = c.toCode(false);
             System.out.println(stringCode);
 
             c.addImport("com.example.package.name");
             c.addFunction("public static boolean test(int value) { return value > 0; }");
             c.addAttribute("public String mValueTest = \"Hello World\";");
 
-            stringCode = c.toCode();
-            System.out.println(stringCode);
+            stringCode = c.toCode(false);
+            //System.out.println(stringCode);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

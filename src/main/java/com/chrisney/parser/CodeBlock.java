@@ -1,5 +1,7 @@
 package com.chrisney.parser;
 
+import com.chrisney.utils.TextUtils;
+
 import java.util.ArrayList;
 
 public class CodeBlock {
@@ -99,20 +101,30 @@ public class CodeBlock {
     }
 
     public String toCode() {
-        return toCode(0);
+        return toCode(true,0);
     }
 
-    private String toCode(int tab) {
+    public String toCode(boolean formatted) {
+        return toCode(formatted, 0);
+    }
 
-        StringBuilder sbTab = new StringBuilder();
-        for(int i = 0; i < tab; i++ ) sbTab.append('\t');
+    private String toCode(boolean formatted, int tab) {
 
         StringBuilder sb = new StringBuilder();
-        if (hasParent) sb.append(sbTab.toString());
+        StringBuilder sbTab = new StringBuilder();
+
+        // Inject Tab characters
+        if (formatted) {
+            for(int i = 0; i < tab; i++ ) sbTab.append('\t');
+            if (hasParent) sb.append(sbTab.toString());
+        }
+
         if (subBlocks == null || subBlocks.size() == 0) {
             sb.append(code);
-            if(code.endsWith(";") || code.endsWith("*/") || code.endsWith(")")) sb.append("\n");
+            if (formatted && (code.endsWith(";") || code.endsWith("*/") || code.endsWith(")"))) sb.append("\n");
+
         } else {
+            // Print function (or class) signature:
             if (code.endsWith("}")) {
                 int i = 0;
                 while (code.charAt(i) != '{') {
@@ -120,13 +132,29 @@ public class CodeBlock {
                     i++;
                 }
             }
-            sb.append("{\n");
+            sb.append("{");
+            if (formatted) sb.append("\n");
+
+            // Print content of function (or class):
             for(CodeBlock subBlock : subBlocks) {
-                sb.append(subBlock.toCode(tab + 1));
+                sb.append(subBlock.toCode(formatted,tab + 1));
             }
-            if (code.endsWith("}")) {
-                if (hasParent) sb.append(sbTab.toString());
-                sb.append("}\n\n");
+
+            // Close function (or class):
+            if (code.trim().endsWith("}")) {
+                if (formatted) {
+                    if (hasParent) sb.append(sbTab.toString());
+                    sb.append("}\n\n");
+                } else {
+                    int max = code.length() - 1;
+                    int i = max;
+                    for (; i > 0; i--) {
+                        char c = code.charAt(i);
+                        if (!TextUtils.isEmptyChar(c) && i < max) break;
+                    }
+                    String end = code.substring(i + 1);
+                    sb.append(end);
+                }
             }
         }
         return sb.toString();

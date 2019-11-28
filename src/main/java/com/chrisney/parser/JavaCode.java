@@ -294,10 +294,21 @@ public class JavaCode {
      * Source code formatted
      * @return Print the source code formatted
      */
-    public String toCode() {
+    public String toCode(boolean formatted) {
         StringBuilder sb = new StringBuilder();
         for(CodeBlock block : getAllBlocks()) {
-            if (!block.hasParent) sb.append(block.toCode());
+            if (!block.hasParent) sb.append(block.toCode(formatted));
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if (this.codeBlocks != null) {
+            for(CodeBlock block : this.codeBlocks) {
+                sb.append(block.code);
+            }
         }
         return sb.toString();
     }
