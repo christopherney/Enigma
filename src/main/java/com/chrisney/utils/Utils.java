@@ -1,9 +1,26 @@
 package com.chrisney.utils;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
 
+import static org.gradle.internal.impldep.com.google.common.io.Resources.getResource;
+
 public class Utils {
+
+    public static File getFileResource(String fileName) {
+        File file = null;
+        try {
+            URL src = getResource(fileName);
+            file = new File(src.toURI());
+            if (!file.exists()) return null;
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return file;
+    }
 
     public static int getRandomNumberInRange(int min, int max) {
         if (min >= max) {

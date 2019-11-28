@@ -23,6 +23,10 @@ public class JavaCode {
      */
     private ArrayList<CodeString> codeStrings;
 
+    /**
+     * Original source code
+     */
+    private String sourceCode;
 
     private static final String FAKE_KEY_CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789qwertyuiopasdfghjklzxcvbnm#$*!?";
     private static final String FAKE_PARAM_CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
@@ -31,10 +35,12 @@ public class JavaCode {
      * Constructor
      * @param blocks Blocks of codes
      * @param strings String values
+     * @param sourceCode Original source code
      */
-    public JavaCode(ArrayList<CodeBlock> blocks, ArrayList<CodeString> strings) {
+    public JavaCode(ArrayList<CodeBlock> blocks, ArrayList<CodeString> strings, String sourceCode) {
         this.codeBlocks = blocks;
         this.codeStrings = strings;
+        this.sourceCode = sourceCode;
     }
 
     /**
@@ -238,6 +244,9 @@ public class JavaCode {
         return false;
     }
 
+    /**
+     * Inject fake code: fake attribute
+     */
     public void injectFakeKeys() {
         try {
             ArrayList<CodeBlock> functions = getFunctions();
@@ -277,7 +286,20 @@ public class JavaCode {
         return "public static final String " + paramName + " = \"" + randomValue + "\";";
     }
 
-    public String stringToSecureFormat(String value, String key, String functionName, DefaultTask encryptTask) throws Exception {
+    public void encryptStrings(String key, String functionName) throws Exception {
+        for (CodeString cs : getStringValues()) {
+
+            String value = cs.value.substring(1, cs.value.length() - 1);
+            String encrypted = encryptString(value, key, functionName, null);
+
+            int originalLength = cs.value.length();
+            int encryptedLength = encrypted.length();
+
+            System.out.println(cs.value + " == " + this.sourceCode.substring(cs.start, cs.end));
+        }
+    }
+
+    private String encryptString(String value, String key, String functionName, DefaultTask encryptTask) throws Exception {
         StringBuilder builder = new StringBuilder();
         value = value.replace("\\\"", "\"");
         value = value.replace("\\\\", "\\");

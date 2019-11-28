@@ -119,7 +119,7 @@ public class JavaParser {
     public JavaCode parse(String sourceCode) {
         ArrayList<CodeString> strings = new ArrayList<>();
         ArrayList<CodeBlock> blocks = this.parse(sourceCode, null, strings);
-        return new JavaCode(blocks, strings);
+        return new JavaCode(blocks, strings, sourceCode);
     }
 
     /**

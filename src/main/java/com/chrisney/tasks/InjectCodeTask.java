@@ -12,6 +12,7 @@ public class InjectCodeTask extends AbstractTask {
 
     public static final String PACKAGE_NAME = "com.chrisney";
     public static final String CLASS_NAME = "EnigmaUtils";
+    public static final String FUNCTION_NAME = InjectCodeTask.CLASS_NAME + ".enigmatization";
     public static final String SOURCE_CODE = "package " + PACKAGE_NAME + ";\n" +
             "\n" +
             "import javax.crypto.Cipher;\n" +
