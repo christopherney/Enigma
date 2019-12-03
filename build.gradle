@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'chrisney'
-version '1.0-SNAPSHOT'
+version '1.0.0.1-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
@@ -30,7 +30,12 @@ pluginBundle {
     tags = ['obfuscation', 'obfuscator', 'encryption', 'string-encryption', 'security']
 }
 
+/**
+ * Publish on gradle.org
+ * $ ./gradlew publishPlugins
+ */
 gradlePlugin {
+    //noinspection GroovyAssignabilityCheck
     plugins {
         enigmaPlugin {
             id = 'com.chrisney.enigma'
@@ -41,7 +46,9 @@ gradlePlugin {
     }
 }
 
-/** Local Maven repository **/
+/**
+ * Local Maven repository (for testing purpose)
+ */
 uploadArchives {
     repositories {
         mavenDeployer {
