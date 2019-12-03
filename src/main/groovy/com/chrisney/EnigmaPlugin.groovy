@@ -5,6 +5,8 @@ import com.chrisney.tasks.CleanBackupTask
 import com.chrisney.tasks.EnigmaTask
 import com.chrisney.tasks.InjectCodeTask
 import com.chrisney.tasks.RestoreTask
+import com.chrisney.utils.TextUtils
+import com.chrisney.utils.Utils
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -15,6 +17,10 @@ class EnigmaPlugin implements Plugin<Project> {
 
         // https://docs.gradle.org/current/userguide/custom_plugins.html
         def extension = project.extensions.create('enigma', EnigmaPluginExtension)
+
+        // Generate random hash key, if not defined
+        if (TextUtils.isEmpty(extension.hash))
+            extension.hash = Utils.randomHashKey()
 
         project.afterEvaluate {
 

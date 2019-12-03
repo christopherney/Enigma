@@ -1,5 +1,7 @@
 package com.chrisney.utils;
 
+import com.chrisney.parser.JavaCode;
+
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -49,5 +51,13 @@ public class Utils {
             list.add(o);
         }
         return list;
+    }
+
+    /**
+     * Generate random hash key (32 characters)
+     * @return Hash key
+     */
+    public static String randomHashKey() {
+        return TextUtils.getRandomString(32, JavaCode.KEY_CHARACTERS);
     }
 }

@@ -28,8 +28,8 @@ public class JavaCode {
      */
     private String sourceCode;
 
-    private static final String FAKE_KEY_CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789qwertyuiopasdfghjklzxcvbnm#$*!?";
-    private static final String FAKE_PARAM_CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+    public static final String KEY_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789qwertyuiopasdfghjklzxcvbnm#$*!?";
+    public static final String PARAM_CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
 
     /**
      * Constructor
@@ -75,6 +75,25 @@ public class JavaCode {
             }
         }
         return result;
+    }
+
+    /**
+     * Return of block of code from a start & end characters indexes.
+     * @param blocks Blocks to search
+     * @param start Start index character
+     * @param end End index character
+     * @return Block if found, otherwise null
+     */
+    private CodeBlock getBlockBetween(ArrayList<CodeBlock> blocks, int start, int end) {
+        for (CodeBlock block : blocks) {
+            if (block.subBlocks != null && block.subBlocks.size() > 0) {
+                CodeBlock b = getBlockBetween(block.subBlocks, start, end);
+                if (b != null) return b;
+            } else if (block.getStart() <= start && end <= block.getEnd()) {
+                return block;
+            }
+        }
+        return null;
     }
 
     /**
@@ -251,7 +270,7 @@ public class JavaCode {
         try {
             ArrayList<CodeBlock> functions = getFunctions();
             if (functions.size() > 0) {
-                String fakeParamName = TextUtils.getRandomString(10, FAKE_PARAM_CHARACTERS);
+                String fakeParamName = TextUtils.getRandomString(10, PARAM_CHARACTERS);
 
                 String fakeAttribute = getFakeAttribute(fakeParamName);
                 addAttribute(fakeAttribute);
@@ -282,20 +301,46 @@ public class JavaCode {
 
     private String getFakeAttribute(String paramName) {
         int sizeValue = Utils.getRandomNumberInRange(10, 30);
-        String randomValue = TextUtils.getRandomString(sizeValue, FAKE_KEY_CHARACTERS);
+        String randomValue = TextUtils.getRandomString(sizeValue, KEY_CHARACTERS);
         return "public static final String " + paramName + " = \"" + randomValue + "\";";
     }
 
     public void encryptStrings(String key, String functionName) throws Exception {
+
+        int stringOffset = 0;
+        CodeBlock block = null;
+
         for (CodeString cs : getStringValues()) {
 
-            String value = cs.value.substring(1, cs.value.length() - 1);
-            String encrypted = encryptString(value, key, functionName, null);
+            if (block == null || !(block.getStart() <= cs.start && cs.end <= block.getEnd())) {
+                block = getBlockBetween(this.codeBlocks, cs.start, cs.end);
+                stringOffset = 0;
+            }
 
-            int originalLength = cs.value.length();
-            int encryptedLength = encrypted.length();
+            if (block != null) {
+                int bStart = cs.start - (block.start + block.offset);
+                int bEnd = cs.end - (block.start + block.offset);
+                // System.out.println(cs.value + " == " + block.code.substring(bStart, bEnd));
 
-            System.out.println(cs.value + " == " + this.sourceCode.substring(cs.start, cs.end));
+                String value = cs.value.substring(1, cs.value.length() - 1);
+                String encrypted = encryptString(value, key, functionName, null);
+
+                StringBuilder builder = new StringBuilder();
+                builder.append(block.code, 0, bStart + stringOffset);
+                builder.append(encrypted);
+                builder.append(block.code, bEnd  + stringOffset, block.code.length());
+
+                int originalLength = cs.value.length();
+                int encryptedLength = encrypted.length();
+                int lengthDiff = (encryptedLength - originalLength);
+
+                // System.out.println(builder.toString());
+                block.code = builder.toString();
+                // block.end += lengthDiff;
+
+                stringOffset += lengthDiff;
+
+            }
         }
     }
 

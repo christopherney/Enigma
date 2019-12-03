@@ -17,6 +17,11 @@ public class CodeBlock {
     public int end = -1;
 
     /**
+     * Start/End offset
+     */
+    public int offset = 0;
+
+    /**
      * Source code
      */
     public String code;
@@ -61,11 +66,6 @@ public class CodeBlock {
      */
     public boolean hasParent = false;
 
-    /**
-     * Start/End offset
-     */
-    public int offset = 0;
-
     public enum Modifier {
         Public,
         Private,
@@ -90,6 +90,14 @@ public class CodeBlock {
         LineOfCode,
         Return,
         StringValue
+    }
+
+    public int getStart() {
+        return start + offset;
+    }
+
+    public int getEnd() {
+        return end + offset;
     }
 
     public String wordsToString() {

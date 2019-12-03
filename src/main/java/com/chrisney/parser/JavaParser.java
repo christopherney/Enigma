@@ -257,8 +257,11 @@ public class JavaParser {
                         // Search block name and properties:
                         parseBlockProperties(block);
 
-                        // System.out.println(block.subCode);
-                        block.subBlocks = this.parse(block.subCode, block, null, block.start + subCodeStart);
+                        // Compute the sub block offset (chars index):
+                        int subBlockOffset = block.start + block.offset + subCodeStart;
+
+                        // Parse the sub block:
+                        block.subBlocks = this.parse(block.subCode, block, null, subBlockOffset);
 
                     } else {
                         // Set block type:

@@ -25,7 +25,7 @@ buildscript {
 ```
 
 build.gradle (app)
-```java
+```groovy
 apply plugin: 'com.android.application'
 
 // Add Enigma Plugin
@@ -33,6 +33,7 @@ apply plugin: 'com.chrisney.enigma'
 
 // Set Enigma options:
 enigma.enabled = true
+enigma.injectFakeKeys = true
 enigma.hash = "LXeyH4qdtk2YqNDnLqZzX5HmPEwEwZEN"
 enigma.ignoredClasses = ["com.my.packagename.MainActivity.java"]
 
@@ -50,10 +51,10 @@ android {
 
 During the compilation process, Enigma plugin will:
 - Backup all Java files in backup directory **enigma-backup**
-- Parse and encrypt all String values for each Java file
-- Inject Enigma source code 
-- Inject fake secrete keys (optional - check *enigma.injectFakeKeys* option)
-- Complile YourApp (classic process)
+- Parse your code and encrypt all String values for each Java file
+- Inject Enigma source code (encryption code)
+- Inject fake secrete keys (optional - check **enigma.injectFakeKeys** option)
+- Compile your App (classic process)
 - Restore your original Java files
 
 ```sh
@@ -89,3 +90,14 @@ $ ./gradlew assembleRelease
 🧹 Remove Enigma code: ~/HelloWorld/app/src/main/java/com/app
 
 ```
+
+## Options
+
+Bellow the options of Enigma plugin:
+
+* **enigma.enabled** *(true | false)* : Enable or disable the string encryption process (default: true)
+* **enigma.injectFakeKeys** *(true | false)* : if activated, create fake string keys and injected it into your code (default: true)
+* **enigma.hash** (string) : let you define your own encryption key (32 characters recommended)
+* **enigma.classes** (array of strings) : let you defined the only classes to encrypt
+* **enigma.ignoredClasses** (array of strings): define the classes to not encrypt
+* **enigma.srcJava** (string): root path of your JAVA files (default: **/app/src/main/java**)
