@@ -94,9 +94,9 @@ $ ./gradlew assembleRelease
 
 Bellow the options of Enigma plugin:
 
-* **com.chrisney.enigma.enabled** *(true | false)* : Enable or disable the string encryption process (default: true)
-* **com.chrisney.enigma.injectFakeKeys** *(true | false)* : if activated, create fake string keys and injected it into your code (default: true)
-* **com.chrisney.enigma.hash** (string) : let you define your own encryption key (32 characters recommended)
-* **com.chrisney.enigma.classes** (array of strings) : let you defined the only classes to encrypt
-* **com.chrisney.enigma.ignoredClasses** (array of strings): define the classes to not encrypt
-* **com.chrisney.enigma.srcJava** (string): root path of your JAVA files (default: **/app/src/main/java**)
+* **enigma.enabled** *(true | false)* : Enable or disable the string encryption process (default: true)
+* **enigma.injectFakeKeys** *(true | false)* : if activated, create fake string keys and injected it into your code (default: true)
+* **enigma.hash** (string) : let you define your own encryption key (32 characters recommended)
+* **enigma.classes** (array of strings) : let you defined the only classes to encrypt
+* **enigma.ignoredClasses** (array of strings): define the classes to not encrypt
+* **enigma.srcJava** (string): root path of your JAVA files (default: **/app/src/main/java**)
