@@ -198,7 +198,7 @@ public class JavaCode {
     /**
      * Add a function into the class
      * @param functionCode Function to add
-     * @throws ClassNotFoundException
+     * @throws ClassNotFoundException Throw is the main class is not found
      */
     public void addFunction(String functionCode) throws ClassNotFoundException {
         addFunction(functionCode, null);

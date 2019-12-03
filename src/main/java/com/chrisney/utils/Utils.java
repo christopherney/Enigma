@@ -10,8 +10,16 @@ import java.util.Random;
 
 import static org.gradle.internal.impldep.com.google.common.io.Resources.getResource;
 
+/**
+ * Various helper functions
+ */
 public class Utils {
 
+    /**
+     * Return the file path of a resource
+     * @param fileName Name of the resource
+     * @return File path of the resource if exists, otherwise return null
+     */
     public static File getFileResource(String fileName) {
         File file = null;
         try {
@@ -24,6 +32,12 @@ public class Utils {
         return file;
     }
 
+    /**
+     * Generate a random number between a range
+     * @param min Min value
+     * @param max Max value
+     * @return Random value
+     */
     public static int getRandomNumberInRange(int min, int max) {
         if (min >= max) {
             throw new IllegalArgumentException("max must be greater than min");
@@ -32,6 +46,12 @@ public class Utils {
         return r.nextInt((max - min) + 1) + min;
     }
 
+    /**
+     * Insert an Object into an ArrayList at an specific index (without erase the existing one)
+     * @param arrayList ArrayList to edit
+     * @param index Index where insert the new object
+     * @param value Object to insert
+     */
     public static void insertInArray(ArrayList arrayList, int index, Object value) {
         for (int i = arrayList.size() - 1; i >= 0; i--) {
             Object v =  arrayList.get(i);
@@ -45,6 +65,11 @@ public class Utils {
         arrayList.set(index, value);
     }
 
+    /**
+     * Convert a simple array to an ArrayList
+     * @param array Simple Array
+     * @return ArrayList
+     */
     public static ArrayList toArrayList(Object[] array) {
         ArrayList list = new ArrayList();
         for (Object o : array) {

@@ -1,5 +1,5 @@
 # Enigma
-Gradle Plugin - Obfuscator String Encryption (Android/Java)
+Gradle Plugin - Obfuscator Strings Encryption (Android/Java)
 
 This project is a simple Gradle plugin to help you to encrypt all String values of your Android Java code at the compilation time.
 
@@ -34,7 +34,6 @@ apply plugin: 'com.chrisney.enigma'
 // Set Enigma options:
 enigma.enabled = true
 enigma.injectFakeKeys = true
-enigma.hash = "LXeyH4qdtk2YqNDnLqZzX5HmPEwEwZEN"
 enigma.ignoredClasses = ["com.my.packagename.MainActivity.java"]
 
 android {

@@ -1,6 +1,8 @@
 plugins {
     id 'groovy'
     id 'java'
+    id 'java-gradle-plugin'
+    id 'com.gradle.plugin-publish' version '0.10.1'
 }
 
 group 'enigma'
@@ -21,6 +23,23 @@ dependencies {
 }
 
 apply plugin: 'maven'
+
+pluginBundle {
+    website = 'https://github.com/christopherney/Enigma'
+    vcsUrl = 'https://github.com/christopherney/Enigma'
+    tags = ['obfuscation', 'obfuscator', 'encryption', 'string-encryption', 'security']
+}
+
+gradlePlugin {
+    plugins {
+        enigmaPlugin {
+            id = 'com.chrisney.enigma'
+            displayName = 'Enigma Plugin'
+            description = 'Obfuscator Strings Encryption plugin for Android/Java apps.'
+            implementationClass = 'com.crhisney.EnigmaPlugin'
+        }
+    }
+}
 
 /** Local Maven repository **/
 uploadArchives {
