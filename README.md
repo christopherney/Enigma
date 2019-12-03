@@ -10,16 +10,16 @@ This project is a simple Gradle plugin to help you to encrypt all String values 
 ## How integrate it?
 
 build.gradle (project)
-```Gradle
+```groovy
 buildscript {
     repositories {
         google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.1'
+        classpath 'com.android.tools.build:gradle:3.5.2'
         // Add the Enigma classpath
-        classpath 'com.chrisney.enigma:com.chrisney.enigma:1.0-SNAPSHOT'
+        classpath 'chrisney:enigma:1.0-SNAPSHOT'
     }
 }
 ```
@@ -29,12 +29,12 @@ build.gradle (app)
 apply plugin: 'com.android.application'
 
 // Add Enigma Plugin
-apply plugin: 'com.chrisney.com.chrisney.enigma'
+apply plugin: 'com.chrisney.enigma'
 
 // Set Enigma options:
-com.chrisney.enigma.enabled = true
-com.chrisney.enigma.injectFakeKeys = true
-com.chrisney.enigma.ignoredClasses = ["com.my.packagename.MainActivity.java"]
+enigma.enabled = true
+enigma.injectFakeKeys = true
+enigma.ignoredClasses = ["com.my.packagename.MainActivity.java"]
 
 android {
     buildTypes {
