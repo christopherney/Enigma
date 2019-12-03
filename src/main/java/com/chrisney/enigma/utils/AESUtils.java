@@ -1,4 +1,4 @@
-package com.chrisney.utils;
+package com.chrisney.enigma.utils;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;

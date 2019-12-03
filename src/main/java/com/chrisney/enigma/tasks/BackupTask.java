@@ -1,4 +1,4 @@
-package com.chrisney.tasks;
+package com.chrisney.enigma.tasks;
 
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.tasks.TaskAction;

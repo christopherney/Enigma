@@ -1,6 +1,6 @@
-package com.chrisney.utils;
+package com.chrisney.enigma.utils;
 
-import com.chrisney.parser.JavaCode;
+import com.chrisney.enigma.parser.JavaCode;
 
 import java.io.File;
 import java.net.URISyntaxException;

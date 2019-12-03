@@ -1,12 +1,12 @@
-package com.chrisney
+package com.chrisney.enigma
 
-import com.chrisney.tasks.BackupTask
-import com.chrisney.tasks.CleanBackupTask
-import com.chrisney.tasks.EnigmaTask
-import com.chrisney.tasks.InjectCodeTask
-import com.chrisney.tasks.RestoreTask
-import com.chrisney.utils.TextUtils
-import com.chrisney.utils.Utils
+import com.chrisney.enigma.tasks.BackupTask
+import com.chrisney.enigma.tasks.CleanBackupTask
+import com.chrisney.enigma.tasks.EnigmaTask
+import com.chrisney.enigma.tasks.InjectCodeTask
+import com.chrisney.enigma.tasks.RestoreTask
+import com.chrisney.enigma.utils.TextUtils
+import com.chrisney.enigma.utils.Utils
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 

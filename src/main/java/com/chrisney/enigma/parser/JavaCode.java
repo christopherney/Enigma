@@ -1,8 +1,8 @@
-package com.chrisney.parser;
+package com.chrisney.enigma.parser;
 
-import com.chrisney.utils.AESUtils;
-import com.chrisney.utils.TextUtils;
-import com.chrisney.utils.Utils;
+import com.chrisney.enigma.utils.AESUtils;
+import com.chrisney.enigma.utils.TextUtils;
+import com.chrisney.enigma.utils.Utils;
 import org.gradle.api.DefaultTask;
 
 import java.lang.reflect.Method;

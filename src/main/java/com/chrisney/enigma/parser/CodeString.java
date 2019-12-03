@@ -1,4 +1,4 @@
-package com.chrisney.parser;
+package com.chrisney.enigma.parser;
 
 public class CodeString {
 

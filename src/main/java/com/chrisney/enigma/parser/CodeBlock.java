@@ -1,6 +1,6 @@
-package com.chrisney.parser;
+package com.chrisney.enigma.parser;
 
-import com.chrisney.utils.TextUtils;
+import com.chrisney.enigma.utils.TextUtils;
 
 import java.util.ArrayList;
 

@@ -1,6 +1,6 @@
-package com.chrisney.utils;
+package com.chrisney.enigma.utils;
 
-import com.chrisney.tasks.InjectCodeTask;
+import com.chrisney.enigma.tasks.InjectCodeTask;
 import org.gradle.api.DefaultTask;
 
 import java.lang.reflect.Method;

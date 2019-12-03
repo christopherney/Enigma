@@ -1,4 +1,4 @@
-package com.chrisney
+package com.chrisney.enigma
 
 class EnigmaPluginExtension {
     /**

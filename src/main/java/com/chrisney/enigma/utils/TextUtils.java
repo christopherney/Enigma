@@ -1,4 +1,4 @@
-package com.chrisney.utils;
+package com.chrisney.enigma.utils;
 
 import java.util.Random;
 

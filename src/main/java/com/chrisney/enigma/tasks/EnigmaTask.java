@@ -1,10 +1,10 @@
-package com.chrisney.tasks;
+package com.chrisney.enigma.tasks;
 
-import com.chrisney.parser.JavaCode;
-import com.chrisney.parser.JavaParser;
-import com.chrisney.utils.AESUtils;
-import com.chrisney.utils.CodeParser;
-import com.chrisney.utils.TextUtils;
+import com.chrisney.enigma.parser.JavaCode;
+import com.chrisney.enigma.parser.JavaParser;
+import com.chrisney.enigma.utils.AESUtils;
+import com.chrisney.enigma.utils.CodeParser;
+import com.chrisney.enigma.utils.TextUtils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.apache.commons.io.FileUtils;
@@ -37,7 +37,7 @@ public class EnigmaTask extends AbstractTask {
             System.out.println("⚠️ Missing Hash value to encrypt files (or Custom Encryption Task)");
             return;
         } else if (!TextUtils.isEmpty(this.hash) && this.hash.length() < AESUtils.MIN_KEY_SIZE) {
-            System.out.println("⚠️ The secrete 'enigma.hash' must at least contains " + AESUtils.MIN_KEY_SIZE + " characters!");
+            System.out.println("⚠️ The secrete 'com.chrisney.enigma.hash' must at least contains " + AESUtils.MIN_KEY_SIZE + " characters!");
             return;
         }
 

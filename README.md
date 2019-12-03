@@ -19,7 +19,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.1'
         // Add the Enigma classpath
-        classpath 'enigma:enigma:1.0-SNAPSHOT'
+        classpath 'com.chrisney.enigma:com.chrisney.enigma:1.0-SNAPSHOT'
     }
 }
 ```
@@ -29,12 +29,12 @@ build.gradle (app)
 apply plugin: 'com.android.application'
 
 // Add Enigma Plugin
-apply plugin: 'com.chrisney.enigma'
+apply plugin: 'com.chrisney.com.chrisney.enigma'
 
 // Set Enigma options:
-enigma.enabled = true
-enigma.injectFakeKeys = true
-enigma.ignoredClasses = ["com.my.packagename.MainActivity.java"]
+com.chrisney.enigma.enabled = true
+com.chrisney.enigma.injectFakeKeys = true
+com.chrisney.enigma.ignoredClasses = ["com.my.packagename.MainActivity.java"]
 
 android {
     buildTypes {
@@ -49,10 +49,10 @@ android {
 ## Compile your App
 
 During the compilation process, Enigma plugin will:
-- Backup all Java files in backup directory **enigma-backup**
+- Backup all Java files in backup directory **com.chrisney.enigma-backup**
 - Parse your code and encrypt all String values for each Java file
 - Inject Enigma source code (encryption code)
-- Inject fake secrete keys (optional - check **enigma.injectFakeKeys** option)
+- Inject fake secrete keys (optional - check **com.chrisney.enigma.injectFakeKeys** option)
 - Compile your App (classic process)
 - Restore your original Java files
 
@@ -94,9 +94,9 @@ $ ./gradlew assembleRelease
 
 Bellow the options of Enigma plugin:
 
-* **enigma.enabled** *(true | false)* : Enable or disable the string encryption process (default: true)
-* **enigma.injectFakeKeys** *(true | false)* : if activated, create fake string keys and injected it into your code (default: true)
-* **enigma.hash** (string) : let you define your own encryption key (32 characters recommended)
-* **enigma.classes** (array of strings) : let you defined the only classes to encrypt
-* **enigma.ignoredClasses** (array of strings): define the classes to not encrypt
-* **enigma.srcJava** (string): root path of your JAVA files (default: **/app/src/main/java**)
+* **com.chrisney.enigma.enabled** *(true | false)* : Enable or disable the string encryption process (default: true)
+* **com.chrisney.enigma.injectFakeKeys** *(true | false)* : if activated, create fake string keys and injected it into your code (default: true)
+* **com.chrisney.enigma.hash** (string) : let you define your own encryption key (32 characters recommended)
+* **com.chrisney.enigma.classes** (array of strings) : let you defined the only classes to encrypt
+* **com.chrisney.enigma.ignoredClasses** (array of strings): define the classes to not encrypt
+* **com.chrisney.enigma.srcJava** (string): root path of your JAVA files (default: **/app/src/main/java**)

@@ -5,7 +5,7 @@ plugins {
     id 'com.gradle.plugin-publish' version '0.10.1'
 }
 
-group 'enigma'
+group 'chrisney'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
@@ -36,7 +36,7 @@ gradlePlugin {
             id = 'com.chrisney.enigma'
             displayName = 'Enigma Plugin'
             description = 'Obfuscator Strings Encryption plugin for Android/Java apps.'
-            implementationClass = 'com.crhisney.EnigmaPlugin'
+            implementationClass = 'com.chrisney.enigma.EnigmaPlugin'
         }
     }
 }
