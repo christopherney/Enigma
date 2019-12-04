@@ -2,6 +2,7 @@ package com.chrisney.enigma.tasks;
 
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.tasks.Internal;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +36,7 @@ public class AbstractTask extends DefaultTask {
      * Return the collection of all JAVA files (*.java) found in the app source folder
      * @return Collection of all JAVA files (*.java)
      */
+    @Internal
     protected Collection<File> getAllJavaFiles() {
         return this.listFileTree(new File(pathSrc), ".java");
     }
@@ -44,6 +46,7 @@ public class AbstractTask extends DefaultTask {
      * Return the collection of all XML files (*.xml) found in the app source folder
      * @return Collection of all XML files (*.xml)
      */
+    @Internal
     protected Collection<File> getAllXmlFiles() {
         return this.listFileTree(new File(pathSrc), ".xml");
     }
