@@ -3,7 +3,7 @@ name: Java CI
 # on: [push]
 on:
   release:
-    types: [published]
+    types: [created]
     
 jobs:
   build:
