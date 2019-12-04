@@ -19,7 +19,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.2'
         // Add the Enigma classpath
-        classpath 'chrisney:enigma:1.0.0.4-SNAPSHOT'
+        classpath 'chrisney:enigma:1.0.0.5-SNAPSHOT'
     }
 }
 ```
@@ -39,7 +39,7 @@ enigma.ignoredClasses = ["com.my.packagename.MainActivity.java"]
 android {
     buildTypes {
         release {
-            // Don't forget to enable Progard !
+            // Don't forget to enable ProGuard !
             minifyEnabled true
         }
     }
