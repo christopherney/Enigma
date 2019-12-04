@@ -19,7 +19,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.2'
         // Add the Enigma classpath
-        classpath 'chrisney:enigma:1.0.0.2-SNAPSHOT'
+        classpath 'chrisney:enigma:1.0.0.3-SNAPSHOT'
     }
 }
 ```
