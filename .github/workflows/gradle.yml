@@ -1,7 +1,10 @@
 name: Java CI
 
-on: [push]
-
+# on: [push]
+on:
+  release:
+    types: [published]
+    
 jobs:
   build:
 
