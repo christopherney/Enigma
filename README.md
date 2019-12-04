@@ -12,15 +12,19 @@ This project is a simple Gradle plugin to help you to encrypt all String values 
 build.gradle (project)
 ```groovy
 buildscript {
-    repositories {
-        google()
-        jcenter()
+  repositories {
+    google()
+    jcenter()
+    // Add Maven repo
+    maven {
+      url "https://plugins.gradle.org/m2/"
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.2'
-        // Add the Enigma classpath
-        classpath 'chrisney:enigma:1.0.0.5-SNAPSHOT'
-    }
+  }
+  dependencies {     
+    classpath 'com.android.tools.build:gradle:3.5.2'
+    // Add the Enigma classpath
+    classpath 'gradle.plugin.chrisney:enigma:1.0.0.5-SNAPSHOT'
+  }
 }
 ```
 
