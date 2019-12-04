@@ -1,5 +1,10 @@
 package com.chrisney.enigma
 
+/**
+ * Enigma Gradle Plugin Options
+ * @author Christopher Ney
+ * @url https://github.com/christopherney/Enigma
+ */
 class EnigmaPluginExtension {
     /**
      * Enable or disable the Enigma Plugin
@@ -22,6 +27,15 @@ class EnigmaPluginExtension {
      */
     String[] classes =  null;
     /**
+     * Enable / disable the fake keys injection (honeypot principal)
+     */
+    boolean injectFakeKeys = true;
+    /**
+     * Enable / disable the DEBUG (verbose) mode
+     */
+    boolean debug = false;
+
+    /**
      * Custom Encryption function (not implemented)
      * @TODO : implement this option
      */
@@ -31,12 +45,4 @@ class EnigmaPluginExtension {
      * @TODO : implement this option
      */
     String encryptionTaskName = null;
-    /**
-     * Enable / disable the fake keys injection (honeypot principal)
-     */
-    boolean injectFakeKeys = true;
-    /**
-     * Enable / disable the DEBUG (verbose) mode
-     */
-    boolean debug = false;
 }

@@ -1,5 +1,8 @@
 package com.chrisney.enigma.parser;
 
+/**
+ * Represent a keyword a JAVA code
+ */
 public class CodeString {
 
     /**

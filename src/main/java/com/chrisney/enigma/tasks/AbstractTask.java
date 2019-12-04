@@ -12,6 +12,8 @@ import java.util.Set;
 
 /**
  * Abstract Enigma Gradle Task
+ * @author Christopher Ney
+ * @url https://github.com/christopherney/Enigma
  */
 public class AbstractTask extends DefaultTask {
 

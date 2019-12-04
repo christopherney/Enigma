@@ -4,6 +4,9 @@ import com.chrisney.enigma.utils.TextUtils;
 
 import java.util.ArrayList;
 
+/**
+ * Represent a block of JAVA code
+ */
 public class CodeBlock {
 
     /**

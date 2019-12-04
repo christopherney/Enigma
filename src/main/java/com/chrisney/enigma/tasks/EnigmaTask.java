@@ -13,6 +13,8 @@ import java.io.File;
 
 /**
  * Gradle Task to parse JAVA source code and encrypt string values.
+ * @author Christopher Ney
+ * @url https://github.com/christopherney/Enigma
  */
 public class EnigmaTask extends AbstractTask {
 

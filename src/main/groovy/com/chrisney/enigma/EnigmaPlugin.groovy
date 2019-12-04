@@ -10,6 +10,11 @@ import com.chrisney.enigma.utils.Utils
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+/**
+ * Enigma Gradle Plugin
+ * @author Christopher Ney
+ * @url https://github.com/christopherney/Enigma
+ */
 class EnigmaPlugin implements Plugin<Project> {
 
     @Override

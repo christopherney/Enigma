@@ -7,6 +7,8 @@ import java.io.IOException;
 
 /**
  * Gradle Task to clean Backup directory.
+ * @author Christopher Ney
+ * @url https://github.com/christopherney/Enigma
  */
 public class CleanBackupTask extends AbstractTask {
 
