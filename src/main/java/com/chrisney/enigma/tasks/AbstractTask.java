@@ -1,6 +1,5 @@
 package com.chrisney.enigma.tasks;
 
-import com.chrisney.enigma.utils.CodeParser;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.DefaultTask;
 
@@ -10,9 +9,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Abstract Enigma Gradle Task
+ */
 public class AbstractTask extends DefaultTask {
 
-    private static final String BACKUP_DIR = "com.chrisney.enigma-backup";
+    private static final String BACKUP_DIR = "enigma-backup";
     private static final String SVN_FOLDER = ".svn";
     private static final String MERCURIAL_FOLDER = ".hg";
     private static final String GIT_FOLDER = ".git";
@@ -26,7 +28,7 @@ public class AbstractTask extends DefaultTask {
     public String pathSrc;
 
     public AbstractTask() {
-        this.setGroup("com/chrisney/enigma");
+        this.setGroup("enigma");
     }
 
     /**
@@ -164,6 +166,6 @@ public class AbstractTask extends DefaultTask {
      */
     protected boolean isEnigmatized(File srcFile) throws IOException {
         String contents = FileUtils.readFileToString(srcFile, "UTF-8");
-        return contents.contains(CodeParser.importString) || contents.contains(CodeParser.functionName);
+        return contents.contains(InjectCodeTask.IMPORT_NAME) || contents.contains(InjectCodeTask.FUNCTION_NAME);
     }
 }

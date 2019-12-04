@@ -7,6 +7,9 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Gradle Task to backup original source code, before Enigma code injection.
+ */
 public class BackupTask extends AbstractTask {
 
     @Inject
@@ -25,6 +28,11 @@ public class BackupTask extends AbstractTask {
         }
     }
 
+    /**
+     * Backup a file into the backup directory
+     * @param file File to backup
+     * @throws IOException I/O Exception
+     */
     private void backupFile(File file) throws IOException {
         String srcFile = file.getAbsolutePath().replace(rootProject, "");
         if (isEnigmaFile(file)) return;

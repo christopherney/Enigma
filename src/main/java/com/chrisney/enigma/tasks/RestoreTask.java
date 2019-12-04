@@ -7,6 +7,9 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Gradle Task to restore original JAVA files after compilation.
+ */
 public class RestoreTask extends AbstractTask {
 
     @Inject

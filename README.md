@@ -19,7 +19,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.2'
         // Add the Enigma classpath
-        classpath 'chrisney:enigma:1.0-SNAPSHOT'
+        classpath 'chrisney:enigma:1.0.0.2-SNAPSHOT'
     }
 }
 ```
@@ -49,10 +49,10 @@ android {
 ## Compile your App
 
 During the compilation process, Enigma plugin will:
-- Backup all Java files in backup directory **com.chrisney.enigma-backup**
+- Backup all Java files in backup directory **enigma-backup**
 - Parse your code and encrypt all String values for each Java file
 - Inject Enigma source code (encryption code)
-- Inject fake secrete keys (optional - check **com.chrisney.enigma.injectFakeKeys** option)
+- Inject fake secrete keys (optional - check **enigma.injectFakeKeys** option)
 - Compile your App (classic process)
 - Restore your original Java files
 

@@ -5,6 +5,9 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * AES Encryption utils.
+ */
 public class AESUtils {
 
     public static final int MIN_KEY_SIZE = 16;

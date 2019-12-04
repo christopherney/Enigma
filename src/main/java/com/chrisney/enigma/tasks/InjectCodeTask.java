@@ -8,11 +8,16 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Gradle Task to inject Enigma source code.
+ */
 public class InjectCodeTask extends AbstractTask {
 
     public static final String PACKAGE_NAME = "com.chrisney.enigma";
     public static final String CLASS_NAME = "EnigmaUtils";
     public static final String FUNCTION_NAME = InjectCodeTask.CLASS_NAME + ".enigmatization";
+    public static final String IMPORT_NAME = "import " + InjectCodeTask.PACKAGE_NAME + "." + InjectCodeTask.CLASS_NAME + ";";
+
     public static final String SOURCE_CODE = "package " + PACKAGE_NAME + ";\n" +
             "\n" +
             "import javax.crypto.Cipher;\n" +

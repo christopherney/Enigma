@@ -3,7 +3,6 @@ package com.chrisney.enigma.tasks;
 import com.chrisney.enigma.parser.JavaCode;
 import com.chrisney.enigma.parser.JavaParser;
 import com.chrisney.enigma.utils.AESUtils;
-import com.chrisney.enigma.utils.CodeParser;
 import com.chrisney.enigma.utils.TextUtils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
@@ -12,6 +11,9 @@ import org.apache.commons.io.FileUtils;
 import javax.inject.Inject;
 import java.io.File;
 
+/**
+ * Gradle Task to parse JAVA source code and encrypt string values.
+ */
 public class EnigmaTask extends AbstractTask {
 
     public String hash;
@@ -20,8 +22,6 @@ public class EnigmaTask extends AbstractTask {
     public String customFunction = null;
     public DefaultTask customEncryptionTask = null;
     public boolean injectFakeKeys = true;
-
-    private CodeParser codeParser;
 
     @Inject
     public EnigmaTask() {
@@ -45,11 +45,6 @@ public class EnigmaTask extends AbstractTask {
             System.out.println("⚠️ Impossible to execute 'encrypt' task if backup directory not exists!");
             return;
         }
-
-        // Set Custom encryption task if exists;
-        codeParser = new CodeParser(this.debug);
-        codeParser.encryptTask = this.customEncryptionTask;
-        codeParser.customFunctionName = this.customFunction;
 
         for (File javaFile : this.getAllJavaFiles()) {
             if (!isSelected(javaFile) || isIgnored(javaFile)) {
