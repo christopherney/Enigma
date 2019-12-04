@@ -10,7 +10,6 @@ import java.io.IOException;
 /**
  * Gradle Task to restore original JAVA files after compilation.
  * @author Christopher Ney
- * @url https://github.com/christopherney/Enigma
  */
 public class RestoreTask extends AbstractTask {
 

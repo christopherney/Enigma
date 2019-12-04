@@ -11,7 +11,6 @@ import java.io.IOException;
 /**
  * Gradle Task to inject Enigma source code.
  * @author Christopher Ney
- * @url https://github.com/christopherney/Enigma
  */
 public class InjectCodeTask extends AbstractTask {
 

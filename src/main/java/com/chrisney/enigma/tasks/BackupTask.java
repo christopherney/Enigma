@@ -10,7 +10,6 @@ import java.io.IOException;
 /**
  * Gradle Task to backup original source code, before Enigma code injection.
  * @author Christopher Ney
- * @url https://github.com/christopherney/Enigma
  */
 public class BackupTask extends AbstractTask {
 

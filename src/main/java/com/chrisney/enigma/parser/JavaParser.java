@@ -7,7 +7,6 @@ import java.util.ArrayList;
 /**
  * JAVA Simple Parser: parse JAVA source code and detects String values
  * @author Christopher Ney
- * @url https://github.com/christopherney/Enigma
  */
 public class JavaParser {
 
