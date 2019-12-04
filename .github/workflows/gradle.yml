@@ -1,9 +1,6 @@
 name: Java CI
 
-# on: [push]
-on:
-  release:
-    types: [created]
+on: [create]
     
 jobs:
   build:
