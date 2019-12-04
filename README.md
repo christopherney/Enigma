@@ -7,6 +7,8 @@ This project is a simple Gradle plugin to help you to encrypt all String values 
 
 **Recommended: commit your changes before compile your app with Enigma activated**
 
+Gradle Plugin page: https://plugins.gradle.org/plugin/com.chrisney.enigma
+
 ## How integrate it?
 
 build.gradle (project)
