@@ -87,10 +87,12 @@ class EnigmaPlugin implements Plugin<Project> {
             project.tasks.getByName('preBuild').dependsOn('injectCode')
             project.tasks.getByName('preBuild').dependsOn('encrypt')
 
-            project.tasks.getByName('assembleRelease').finalizedBy('restore')
-            project.tasks.getByName('assembleDebug').finalizedBy('restore')
-            project.tasks.getByName('generateReleaseSources').finalizedBy('restore')
-            project.tasks.getByName('generateDebugSources').finalizedBy('restore')
+            for (task in project.tasks) {
+                if (task.name.startsWith('assemble') && (task.name.endsWith('Release') || task.name.endsWith('Debug')))
+                    task.finalizedBy('restore')
+                if (task.name.startsWith('generate') && task.name.endsWith('Sources'))
+                    task.finalizedBy('restore')
+            }
         }
     }
 }
