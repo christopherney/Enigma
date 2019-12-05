@@ -215,7 +215,10 @@ public class JavaParser {
                     if (block == null) {
                         block = new CodeBlock();
                         block.offset = offset;
-                        block.hasParent = (parent != null);
+                        if  (parent != null) {
+                            block.hasParent = true;
+                            block.parentType = parent.type;
+                        }
                         block.start = i - word.value.length();
                     }
 
@@ -236,8 +239,8 @@ public class JavaParser {
             // Detect END of block
             if (block != null) {
 
-                if ((
-                        (curChar.equals(cSemicolon) || curChar.equals(cCurlyBracketClose)) // End of Line of code, End of Class, Function, Condition, Loop...
+                if ((   // End of Line of code, End of Class, Function, Condition, Loop...
+                        (!CodeBlock.isComment(currentBlock) && (curChar.equals(cSemicolon) || (curChar.equals(cCurlyBracketClose) && !nextNoneEmptyChar.equals(cSemicolon) )))
                         || isEndAnnotation(currentBlock, curChar, nextNoneEmptyChar, counterParenthesis) // End of Annotation
                         || (currentBlock == CodeBlock.BlockType.CommentLine && TextUtils.isReturnChar(curChar)) // End of Comment line
                         || isEndBlockComment(currentBlock, curChar, prevChar) // End of Comment Block
@@ -254,12 +257,7 @@ public class JavaParser {
                         }
                         int subCodeStart = j + 1;
                         int subCodeEnd = block.code.length() - 1;
-                        try {
-                            block.subCode = block.code.substring(subCodeStart, subCodeEnd);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                            throw ex;
-                        }
+                        block.subCode = block.code.substring(subCodeStart, subCodeEnd);
 
                         // Set block type:
                         block.type = getBlockType(block);
@@ -499,26 +497,30 @@ public class JavaParser {
             for (CodeString word : block.words) {
                 if (word.value.equals(sClass)) return CodeBlock.BlockType.Class;
                 if (word.value.equals(sInterface)) return CodeBlock.BlockType.Interface;
-                if (word.value.equals(sNew)) return CodeBlock.BlockType.AnonymousInnerClass;
-                if (word.value.equals(sVoid)) return CodeBlock.BlockType.Function;
             }
+
+            if (!CodeBlock.isClass(block.parentType))
+                return CodeBlock.BlockType.AnonymousInnerClass;
 
             return CodeBlock.BlockType.Function;
         } else {
+
+            CodeString firstWord = getFirstNoneEmptyWord(block.words);
+            if (firstWord == null) return CodeBlock.BlockType.Undefined;
+
+            if (firstWord.value.equals(sPackage)) return CodeBlock.BlockType.Package;
+            if (firstWord.value.equals(sImport)) return CodeBlock.BlockType.Import;
+            if (firstWord.value.startsWith(String.valueOf(cAnnotation))) return CodeBlock.BlockType.Annotation;
+            if (firstWord.value.equals(sIf) || firstWord.value.equals(sElse) || firstWord.value.equals(sSwitch))
+                return CodeBlock.BlockType.Condition;
+            if (firstWord.value.equals(sFor) || firstWord.value.equals(sWhile)) return CodeBlock.BlockType.Loop;
+            if (firstWord.value.equals(sReturn)) return CodeBlock.BlockType.Return;
+            if (firstWord.value.startsWith(sBlockCommentStart)) return CodeBlock.BlockType.CommentBlock;
+            if (firstWord.value.startsWith(sLineComment)) return CodeBlock.BlockType.CommentLine;
+
             for (CodeString word : block.words) {
                 if (isEmptyWord(word)) continue;
-
-                if (word.value.equals(sPackage)) return CodeBlock.BlockType.Package;
-                if (word.value.equals(sImport)) return CodeBlock.BlockType.Import;
                 if (word.value.equals(sStatic)) return CodeBlock.BlockType.Attribute;
-                if (word.value.equals(sIf) || word.value.equals(sElse) ||  word.value.equals(sSwitch))
-                    return CodeBlock.BlockType.Condition;
-                if (word.value.equals(sFor) || word.value.equals(sWhile)) return CodeBlock.BlockType.Loop;
-                if (word.value.equals(sReturn)) return CodeBlock.BlockType.Return;
-                if (word.value.equals(sClass)) return CodeBlock.BlockType.Class;
-                if (word.value.startsWith(String.valueOf(cAnnotation))) return CodeBlock.BlockType.Annotation;
-                if (word.value.startsWith(sBlockCommentStart)) return CodeBlock.BlockType.CommentBlock;
-                if (word.value.startsWith(sLineComment)) return CodeBlock.BlockType.CommentLine;
             }
         }
 

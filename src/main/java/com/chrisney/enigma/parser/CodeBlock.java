@@ -70,6 +70,11 @@ public class CodeBlock {
     public boolean hasParent = false;
 
     /**
+     * Type of the parent block
+     */
+    public CodeBlock.BlockType parentType = BlockType.Undefined;
+
+    /**
      * Modifiers (for class attributes and functions)
      */
     public enum Modifier {
@@ -137,12 +142,30 @@ public class CodeBlock {
     }
 
     /**
+     * Indicate if the block is a Function or a Class
+     * @param blockType Type of block
+     * @return True if the block is a Function or a Class
+     */
+    public boolean isFunctionOrClass(CodeBlock.BlockType blockType) {
+        return blockType == BlockType.Class || blockType == BlockType.Function;
+    }
+
+    /**
      * Indicate if the block is a line or block of comment
      * @param blockType Type of block
      * @return True if the block is a line or block of comment
      */
     public static boolean isComment(BlockType blockType) {
         return blockType == BlockType.CommentBlock || blockType == BlockType.CommentLine;
+    }
+
+    /**
+     * Indicate if the block is a Class or Anonymous Inner Class
+     * @param blockType Type of block
+     * @return True if the block is a Class or Anonymous Inner Class
+     */
+    public static boolean isClass(BlockType blockType) {
+        return blockType == BlockType.Class || blockType == BlockType.AnonymousInnerClass;
     }
 
     @Override
@@ -153,82 +176,68 @@ public class CodeBlock {
     }
 
     /**
+     * Indicate if the block has children or not.
+     * @return True if the block has children
+     */
+    public boolean hasChildren() {
+        return subBlocks != null && subBlocks.size() > 0;
+    }
+
+    /**
      * Generate the source code of the block
      * @return Source code of the block
      */
     public String toCode() {
-        return toCode(true,0);
+        return toCode(0);
     }
 
     /**
      * Generate the source code of the block
-     * @param formatted True if want format the output
-     * @return Source code of the block
-     */
-    public String toCode(boolean formatted) {
-        return toCode(formatted, 0);
-    }
-
-    /**
-     * Generate the source code of the block
-     * @param formatted True if want format the output
      * @param tab Number of tab space to prepend
      * @return Source code of the block
      */
-    private String toCode(boolean formatted, int tab) {
+    private String toCode(int tab) {
 
         StringBuilder sb = new StringBuilder();
-        StringBuilder sbTab = new StringBuilder();
 
-        // Inject Tab characters
-        if (formatted) {
-            for(int i = 0; i < tab; i++ ) sbTab.append('\t');
-            if (hasParent) sb.append(sbTab.toString());
-        }
-
-        if (subBlocks == null || subBlocks.size() == 0) {
+        if (!hasChildren()) {
             sb.append(code);
-            if (formatted && (code.endsWith(";") || code.endsWith("*/") || code.endsWith(")"))) sb.append("\n");
-
         } else {
-            boolean isFunctionOrClass = code.trim().endsWith("}");
+
+            boolean hasSemicolonBlock = code.trim().endsWith("}");
 
             // Print function (or class) signature:
-            if (isFunctionOrClass) {
+            if (hasSemicolonBlock) {
                 int i = 0;
                 while (code.charAt(i) != '{') {
                     sb.append(code.charAt(i));
                     i++;
                 }
+                sb.append("{");
             }
-            sb.append("{");
-            if (formatted) sb.append("\n");
 
             // Print content of function (or class):
-            for(CodeBlock subBlock : subBlocks) {
-                sb.append(subBlock.toCode(formatted,tab + 1));
+            for (CodeBlock subBlock : subBlocks) {
+                sb.append(subBlock.toCode(tab + 1));
             }
 
             // Close function (or class):
-            if (isFunctionOrClass) {
-                if (formatted) {
-                    if (hasParent) sb.append(sbTab.toString());
-                    if (type == BlockType.AnonymousInnerClass) {
-                        sb.append("};\n\n");
-                    } else {
-                        sb.append("}\n\n");
-                    }
-                } else {
-                    int max = code.length() - 1;
-                    int i = max;
-                    for (; i > 0; i--) {
-                        char c = code.charAt(i);
-                        if (!TextUtils.isEmptyChar(c) && i < max) break;
-                    }
-                    String end = code.substring(i + 1);
-                    sb.append(end);
-                    if (type == BlockType.AnonymousInnerClass) sb.append(";");
+            if (hasSemicolonBlock) {
+
+                if (type == BlockType.AnonymousInnerClass) {
+                    System.out.println("test");
                 }
+
+                int max = code.length() - 1;
+                int i = max;
+                boolean foundSemicolon  = false;
+                for (; i > 0; i--) {
+                    char c = code.charAt(i);
+                    if (!TextUtils.isEmptyChar(c) && foundSemicolon && i < max) break;
+                    if (c == '}') foundSemicolon = true;
+                }
+                String end = code.substring(i + 1);
+                sb.append(end);
 
                 // End Of File
                 if (!hasParent) sb.append("\n");

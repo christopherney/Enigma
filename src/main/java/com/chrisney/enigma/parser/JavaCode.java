@@ -404,22 +404,13 @@ public class JavaCode {
     }
 
     /**
-     * Source code
-     * @return Print the source code
-     */
-    public String toCode() {
-        return toCode(false);
-    }
-
-    /**
      * Source code formatted
-     * @param formatted Option to format output source code
      * @return Print the source code formatted
      */
-    public String toCode(boolean formatted) {
+    public String toCode() {
         StringBuilder sb = new StringBuilder();
         for(CodeBlock block : getAllBlocks()) {
-            if (!block.hasParent) sb.append(block.toCode(formatted));
+            if (!block.hasParent) sb.append(block.toCode());
         }
         return sb.toString();
     }

@@ -40,15 +40,18 @@ public class TestJavaParser {
     public static void testJavaParser() {
         try {
 
-            // File javaFile = Utils.getFileResource("fake-java-file.txt");
-            // File javaFile = Utils.getFileResource("FlingAnimation.txt");
-            File javaFile = Utils.getFileResource("Workspace.txt");
+            // File javaFile = Utils.getFileResource("Utils.java");
+            // File javaFile = Utils.getFileResource("FlingAnimation.java");
+            // File javaFile = Utils.getFileResource("Workspace.java");
+            File javaFile = Utils.getFileResource("fadeAndRemoveEmptyScreen.java");
+
+
             String code = FileUtils.readFileToString(javaFile, "UTF-8");
 
             JavaParser parser = new JavaParser();
             JavaCode c = parser.parse(code);
 
-            String stringCode = c.toCode(false);
+            String stringCode = c.toCode();
             System.out.println(stringCode);
 
             c.addImport("com.example.package.name");
@@ -59,7 +62,7 @@ public class TestJavaParser {
 
             c.encryptStrings("LXeyH4qdtk2YqNDnLqZzX5HmPEwEwZEN", InjectCodeTask.FUNCTION_NAME);
 
-            stringCode = c.toCode(false);
+            stringCode = c.toCode();
             System.out.println(stringCode);
 
         } catch (Exception ex) {
