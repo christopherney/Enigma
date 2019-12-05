@@ -40,7 +40,9 @@ public class TestJavaParser {
     public static void testJavaParser() {
         try {
 
-            File javaFile = Utils.getFileResource("fake-java-file.txt");
+            // File javaFile = Utils.getFileResource("fake-java-file.txt");
+            // File javaFile = Utils.getFileResource("FlingAnimation.txt");
+            File javaFile = Utils.getFileResource("Workspace.txt");
             String code = FileUtils.readFileToString(javaFile, "UTF-8");
 
             JavaParser parser = new JavaParser();

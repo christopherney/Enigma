@@ -69,17 +69,24 @@ public class CodeBlock {
      */
     public boolean hasParent = false;
 
+    /**
+     * Modifiers (for class attributes and functions)
+     */
     public enum Modifier {
         Public,
         Private,
         Protected
     }
 
+    /**
+     * All JAVA types of code blocks
+     */
     public enum BlockType {
         Undefined,
         Package,
         Import,
         Class,
+        AnonymousInnerClass,
         Interface,
         Attribute,
         CommentLine,
@@ -95,18 +102,47 @@ public class CodeBlock {
         StringValue
     }
 
+    /**
+     * Return the start position (character index) with offset
+     * @return Start position (character index) with offset
+     */
     public int getStart() {
         return start + offset;
     }
 
+    /**
+     * Return the end position (character index) with offset
+     * @return End position (character index) with offset
+     */
     public int getEnd() {
         return end + offset;
     }
 
+    /**
+     * Convert all words to a String value (source code)
+     * @return Source code generate from words contains by the block
+     */
     public String wordsToString() {
         StringBuilder sb = new StringBuilder();
         for (CodeString s : words) sb.append(s.value);
         return sb.toString();
+    }
+
+    /**
+     * Indicate if the block is a line or block of comment
+     * @return True if the block is a line or block of comment
+     */
+    public boolean isComment() {
+        return CodeBlock.isComment(type);
+    }
+
+    /**
+     * Indicate if the block is a line or block of comment
+     * @param blockType Type of block
+     * @return True if the block is a line or block of comment
+     */
+    public static boolean isComment(BlockType blockType) {
+        return blockType == BlockType.CommentBlock || blockType == BlockType.CommentLine;
     }
 
     @Override
@@ -116,14 +152,29 @@ public class CodeBlock {
         return "[" + m + (start + offset) + ", " + (end + offset) + "] (" + type + ":" + name + ") " + wordsToString();
     }
 
+    /**
+     * Generate the source code of the block
+     * @return Source code of the block
+     */
     public String toCode() {
         return toCode(true,0);
     }
 
+    /**
+     * Generate the source code of the block
+     * @param formatted True if want format the output
+     * @return Source code of the block
+     */
     public String toCode(boolean formatted) {
         return toCode(formatted, 0);
     }
 
+    /**
+     * Generate the source code of the block
+     * @param formatted True if want format the output
+     * @param tab Number of tab space to prepend
+     * @return Source code of the block
+     */
     private String toCode(boolean formatted, int tab) {
 
         StringBuilder sb = new StringBuilder();
@@ -162,7 +213,11 @@ public class CodeBlock {
             if (isFunctionOrClass) {
                 if (formatted) {
                     if (hasParent) sb.append(sbTab.toString());
-                    sb.append("}\n\n");
+                    if (type == BlockType.AnonymousInnerClass) {
+                        sb.append("};\n\n");
+                    } else {
+                        sb.append("}\n\n");
+                    }
                 } else {
                     int max = code.length() - 1;
                     int i = max;
@@ -172,6 +227,7 @@ public class CodeBlock {
                     }
                     String end = code.substring(i + 1);
                     sb.append(end);
+                    if (type == BlockType.AnonymousInnerClass) sb.append(";");
                 }
 
                 // End Of File

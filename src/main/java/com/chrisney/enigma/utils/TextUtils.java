@@ -4,6 +4,12 @@ import java.util.Random;
 
 public class TextUtils {
 
+    public static boolean endsWith(String value, char character) {
+        if (value == null) return false;
+        String tempValue = value.trim();
+        return tempValue.charAt(tempValue.length() - 1) == character;
+    }
+
     public static boolean isEmpty(String value) {
         return value == null || value.isEmpty();
     }

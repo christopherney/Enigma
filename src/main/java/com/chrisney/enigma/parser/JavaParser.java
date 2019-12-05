@@ -247,14 +247,19 @@ public class JavaParser {
                     block.code = source.substring(block.start, block.end);
 
                     // Analyze sub source code:
-                    if (block.code.endsWith(String.valueOf(cCurlyBracketClose))) {
+                    if (block.code.endsWith(String.valueOf(cCurlyBracketClose)) && !CodeBlock.isComment(currentBlock)) {
                         int j;
                         for (j = 0; j < block.code.length(); j++) {
                             if (block.code.charAt(j) == cCurlyBracketOpen) break;
                         }
                         int subCodeStart = j + 1;
                         int subCodeEnd = block.code.length() - 1;
-                        block.subCode = block.code.substring(subCodeStart, subCodeEnd);
+                        try {
+                            block.subCode = block.code.substring(subCodeStart, subCodeEnd);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                            throw ex;
+                        }
 
                         // Set block type:
                         block.type = getBlockType(block);
@@ -481,17 +486,23 @@ public class JavaParser {
     private CodeBlock.BlockType getBlockType(CodeBlock block) {
         // has nested code (function, condition, class...)
         if (!TextUtils.isEmpty(block.subCode)) {
+
             CodeString firstWord = getFirstNoneEmptyWord(block.words);
+            if (firstWord == null) return CodeBlock.BlockType.Undefined;
+
             if (firstWord.value.startsWith(String.valueOf(cAnnotation))) return CodeBlock.BlockType.Annotation;
             if (firstWord.value.equals(sIf) || firstWord.value.equals(sElse) || firstWord.value.equals(sSwitch))
                 return CodeBlock.BlockType.Condition;
             if (firstWord.value.equals(sFor) || firstWord.value.equals(sWhile)) return CodeBlock.BlockType.Loop;
             if (firstWord.value.equals(sTry) || firstWord.value.equals(sCatch)) return CodeBlock.BlockType.TryCatch;
+
             for (CodeString word : block.words) {
                 if (word.value.equals(sClass)) return CodeBlock.BlockType.Class;
                 if (word.value.equals(sInterface)) return CodeBlock.BlockType.Interface;
+                if (word.value.equals(sNew)) return CodeBlock.BlockType.AnonymousInnerClass;
                 if (word.value.equals(sVoid)) return CodeBlock.BlockType.Function;
             }
+
             return CodeBlock.BlockType.Function;
         } else {
             for (CodeString word : block.words) {
