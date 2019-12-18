@@ -9,8 +9,6 @@ import org.junit.Assert;
 import java.io.File;
 import java.util.ArrayList;
 
-import static org.gradle.internal.impldep.com.google.common.io.Resources.getResource;
-
 public class TestJavaParser {
 
     public static void main(String[] args) {
@@ -43,8 +41,9 @@ public class TestJavaParser {
             // File javaFile = Utils.getFileResource("Utils.java");
             // File javaFile = Utils.getFileResource("FlingAnimation.java");
             // File javaFile = Utils.getFileResource("Workspace.java");
-            File javaFile = Utils.getFileResource("fadeAndRemoveEmptyScreen.java");
-
+            // File javaFile = Utils.getFileResource("fadeAndRemoveEmptyScreen.java");
+            // File javaFile = Utils.getFileResource("BaseFlags.java");
+            File javaFile = Utils.getFileResource("ToggleFlag.java");
 
             String code = FileUtils.readFileToString(javaFile, "UTF-8");
 
@@ -53,6 +52,12 @@ public class TestJavaParser {
 
             String stringCode = c.toCode();
             System.out.println(stringCode);
+
+            if (stringCode.trim().equals(code.trim())) {
+                System.out.println("Parsing with success!");
+            } else {
+                System.out.println("Failed parsing!");
+            }
 
             c.addImport("com.example.package.name");
             c.addFunction("public static boolean test(int value) { return value > 0; }");

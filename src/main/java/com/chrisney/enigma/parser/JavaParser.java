@@ -239,12 +239,12 @@ public class JavaParser {
             // Detect END of block
             if (block != null) {
 
-                if ((   // End of Line of code, End of Class, Function, Condition, Loop...
-                        (!CodeBlock.isComment(currentBlock) && (curChar.equals(cSemicolon) || (curChar.equals(cCurlyBracketClose) && !nextNoneEmptyChar.equals(cSemicolon) )))
+                if ((
+                        isEndOfCodeBlock(currentBlock, curChar, nextNoneEmptyChar) // End of Line of code, End of Class, Function, Condition, Loop...
                         || isEndAnnotation(currentBlock, curChar, nextNoneEmptyChar, counterParenthesis) // End of Annotation
-                        || (currentBlock == CodeBlock.BlockType.CommentLine && TextUtils.isReturnChar(curChar)) // End of Comment line
+                        || (isEndCommentLine(currentBlock, curChar)) // End of Comment line
                         || isEndBlockComment(currentBlock, curChar, prevChar) // End of Comment Block
-                ) &&  counterCurlyBrackets == 0 && counterParenthesis == 0 && counterBrackets == 0) {
+                ) && counterCurlyBrackets == 0 && counterParenthesis == 0 && counterBrackets == 0) {
 
                     block.end = i + 1;
                     block.code = source.substring(block.start, block.end);
@@ -317,6 +317,22 @@ public class JavaParser {
     }
 
     /**
+     * Detect end of Line of code, End of Class, Function, Condition, Loop...
+     * @param currentBlock Current block type
+     * @param curChar Current character
+     * @param nextNoneEmptyChar Next character non empty (if exists)
+     * @return True if end of block
+     */
+    private boolean isEndOfCodeBlock(CodeBlock.BlockType currentBlock, Character curChar, Character nextNoneEmptyChar) {
+        return !CodeBlock.isComment(currentBlock)
+            && currentBlock != CodeBlock.BlockType.StringValue
+            && (
+                    curChar.equals(cSemicolon) ||
+                    (curChar.equals(cCurlyBracketClose) && !nextNoneEmptyChar.equals(cSemicolon))
+            );
+    }
+
+    /**
      * Detect end of block annotation
      * @param currentBlock Current block type
      * @param curChar Current character
@@ -331,6 +347,16 @@ public class JavaParser {
             }
         }
         return false;
+    }
+
+    /**
+     * Detect end of line of Comment
+     * @param currentBlock Current block type
+     * @param curChar Current character
+     * @return True if end of line of Comment is detected
+     */
+    private boolean isEndCommentLine(CodeBlock.BlockType currentBlock, Character curChar) {
+        return currentBlock == CodeBlock.BlockType.CommentLine && TextUtils.isReturnChar(curChar);
     }
 
     /**
@@ -392,14 +418,13 @@ public class JavaParser {
         return false;
     }
 
-    private static void parseBlockProperties(CodeBlock block) {
+    private void parseBlockProperties(CodeBlock block) {
         if (block.type == CodeBlock.BlockType.Class || block.type == CodeBlock.BlockType.Interface) {
             parseClassName(block);
         } else if (block.type == CodeBlock.BlockType.Function) {
             parseFunction(block);
-        // } else if (block.type == CodeBlock.BlockType.Attribute) {
-            // @TODO : reuse parse function ?
-        //    parseAttribute(block);
+        } else if (block.type == CodeBlock.BlockType.Attribute) {
+            parseModifier(block);
         } else if (block.type == CodeBlock.BlockType.Package || block.type == CodeBlock.BlockType.Import) {
             parsePackageOrImportName(block);
         } else if (block.type == CodeBlock.BlockType.Annotation) {
@@ -419,7 +444,7 @@ public class JavaParser {
         block.name = annotationName;
     }
 
-    private static void parseFunction(CodeBlock block) {
+    private void parseFunction(CodeBlock block) {
         String typeName = null;
         for(CodeString word : block.words) {
             if (isBreakCharacter(word.value)) break;
@@ -455,13 +480,18 @@ public class JavaParser {
         return (sPublic.equals(firstWord.value) || sPrivate.equals(firstWord.value) || sProtected.equals(firstWord.value));
     }
 
-    private static void parseModifier(CodeBlock block, String word) {
+    private void parseModifier(CodeBlock block) {
+        CodeString firstWord = getFirstNoneEmptyWord(block.words);
+        if (firstWord != null) parseModifier(block, firstWord.value);
+    }
+
+    private void parseModifier(CodeBlock block, String word) {
         if (sPublic.equals(word)) block.modifier = CodeBlock.Modifier.Public;
         if (sPrivate.equals(word)) block.modifier = CodeBlock.Modifier.Private;
         if (sProtected.equals(word)) block.modifier = CodeBlock.Modifier.Protected;
     }
 
-    private static void parseClassName(CodeBlock block) {
+    private void parseClassName(CodeBlock block) {
         for(CodeString word : block.words) {
             if (isBreakCharacter(word.value)) break;
             parseModifier(block, word.value);

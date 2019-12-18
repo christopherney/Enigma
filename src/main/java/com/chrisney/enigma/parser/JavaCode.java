@@ -189,6 +189,7 @@ public class JavaCode {
         JavaCode javaCode = javaParser.parse("\n\n    " + attributeCode.trim());
         CodeBlock block = javaCode.getAllBlocks().get(0);
         block.hasParent = true;
+        block.parentType = CodeBlock.BlockType.Class;
 
         if (!addBlockAtPosition(blockClass.subBlocks, block, InsertPosition.AtTheEnd, CodeBlock.BlockType.Attribute)) {
             Utils.insertInArray(blockClass.subBlocks, 0, block);
@@ -214,8 +215,10 @@ public class JavaCode {
 
         JavaParser javaParser = new JavaParser();
         JavaCode javaCode = javaParser.parse("\n\n    " + functionCode.trim());
-        CodeBlock block = javaCode.getFunctions().get(0);
+        CodeBlock block = javaCode.getAllBlocks().get(0);
         block.hasParent = true;
+        block.type = CodeBlock.BlockType.Function;
+        block.parentType = blockClass.type;
 
         blockClass.subBlocks.add(block);
     }
