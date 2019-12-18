@@ -208,12 +208,15 @@ public class CodeBlock {
 
             // Print function (or class) signature:
             if (hasSemicolonBlock) {
-                int i = 0;
-                while (code.charAt(i) != '{') {
-                    sb.append(code.charAt(i));
-                    i++;
+                char c;
+                int i;
+                char prevNoneEmptyChar = ' ';
+                for (i = 0; i < code.length(); i++) {
+                    c = code.charAt(i);
+                    if (c == '{' && prevNoneEmptyChar != ']') break;
+                    if (!TextUtils.isEmptyChar(c)) prevNoneEmptyChar = c;
                 }
-                sb.append("{");
+                sb.append(code, 0, i + 1);
             }
 
             // Print content of function (or class):
@@ -225,7 +228,7 @@ public class CodeBlock {
             if (hasSemicolonBlock) {
 
                 if (type == BlockType.AnonymousInnerClass) {
-                    System.out.println("test");
+                    // System.out.println("Is Annonymous inner class");
                 }
 
                 int max = code.length() - 1;

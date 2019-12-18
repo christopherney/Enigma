@@ -251,11 +251,7 @@ public class JavaParser {
 
                     // Analyze sub source code:
                     if (block.code.endsWith(String.valueOf(cCurlyBracketClose)) && !CodeBlock.isComment(currentBlock)) {
-                        int j;
-                        for (j = 0; j < block.code.length(); j++) {
-                            if (block.code.charAt(j) == cCurlyBracketOpen) break;
-                        }
-                        int subCodeStart = j + 1;
+                        int subCodeStart = startOfSubCode(block);
                         int subCodeEnd = block.code.length() - 1;
                         block.subCode = block.code.substring(subCodeStart, subCodeEnd);
 
@@ -314,6 +310,22 @@ public class JavaParser {
         } // End for loop
 
         return blocks;
+    }
+
+    /**
+     * Detect the start of sub code content
+     * @param block Block of code
+     * @return Char index of start of the sub code
+     */
+    private int startOfSubCode(CodeBlock block) {
+        int j;
+        char previousNoneEmptyChar = ' ';
+        for (j = 0; j < block.code.length(); j++) {
+            char c = block.code.charAt(j);
+            if (c == cCurlyBracketOpen && previousNoneEmptyChar != cBracketClose) break;
+            if (!TextUtils.isEmptyChar(c)) previousNoneEmptyChar = c;
+        }
+        return j + 1;
     }
 
     /**

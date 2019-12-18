@@ -43,7 +43,8 @@ public class TestJavaParser {
             // File javaFile = Utils.getFileResource("Workspace.java");
             // File javaFile = Utils.getFileResource("fadeAndRemoveEmptyScreen.java");
             // File javaFile = Utils.getFileResource("BaseFlags.java");
-            File javaFile = Utils.getFileResource("ToggleFlag.java");
+            // File javaFile = Utils.getFileResource("ToggleFlag.java");
+            File javaFile = Utils.getFileResource("GridBackupTable.java");
 
             String code = FileUtils.readFileToString(javaFile, "UTF-8");
 
@@ -51,7 +52,6 @@ public class TestJavaParser {
             JavaCode c = parser.parse(code);
 
             String stringCode = c.toCode();
-            System.out.println(stringCode);
 
             if (stringCode.trim().equals(code.trim())) {
                 System.out.println("Parsing with success!");
