@@ -24,6 +24,7 @@ public class JavaParser {
     private static final char cStar = '*';
     private static final char cEscape = '\\';
     private static final char cAnnotation = '@';
+    private static final char cColon = ':';
 
     private static final String sLineComment = "//";
     private static final String sBlockCommentStart = "/*";
@@ -186,6 +187,7 @@ public class JavaParser {
                 } else if (string != null && currentBlock != CodeBlock.BlockType.StringValue) {
                     string.end = i + 1;
                     string.value = source.substring(string.start, string.end);
+                    string.isCaseValue = (block != null) ? isSwitchCaseValue(block.words, string.value, nextNoneEmptyChar) : false;
                     strings.add(string);
                     string = null;
                 }
@@ -410,6 +412,27 @@ public class JavaParser {
             if (t.equals(word)) return true;
         }
         return false;
+    }
+
+    /**
+     * Check if the string value is a switch/case value condition, example: case "RoundedSquare":
+     * @param words Words before the String value to test
+     * @param value String value to test
+     * @param nextNoneEmptyChar Next none empty character
+     * @return True if the string value is a switch/case value condition
+     */
+    private boolean isSwitchCaseValue(ArrayList<CodeString> words, String value, char nextNoneEmptyChar) {
+        String sDoubleQuote = String.valueOf(cDoubleQuote);
+        if (nextNoneEmptyChar != cColon || !value.startsWith(sDoubleQuote) || !value.endsWith(sDoubleQuote)) return false;
+
+        CodeString prevNonEmptyWord = null;
+        for (int i = words.size() - 1; i > 0; i--) {
+            prevNonEmptyWord = words.get(i);
+            if (!TextUtils.isEmpty(prevNonEmptyWord.value) && prevNonEmptyWord.value.trim().length() > 0) break;
+        }
+
+        if (prevNonEmptyWord == null) return false;
+        return sCase.equals(prevNonEmptyWord.value);
     }
 
     /**

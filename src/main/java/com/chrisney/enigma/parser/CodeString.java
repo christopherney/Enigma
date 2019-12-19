@@ -26,9 +26,14 @@ public class CodeString {
     public boolean isInstruction = false;
 
     /**
-     * Indicate if word is a JAVA native Type
+     * Indicate if word is a JAVA native Type (int, string...)
      */
     public boolean isType = false;
+
+    /**
+     * Indicate if the word is a value of Switch/Case  conditional block
+     */
+    public boolean isCaseValue = false;
 
     /**
      * Constructor

@@ -28,4 +28,19 @@ public class GridBackupTable {
             return true;
         }
     }
+
+    private static IconShape getShapeDefinition(String type, float radius) {
+        switch (type) {
+            case "Circle":
+                return new Circle();
+            case "RoundedSquare":
+                return new RoundedSquare(radius);
+            case "TearDrop":
+                return new TearDrop(radius);
+            case "Squircle":
+                return new Squircle(radius);
+            default:
+                throw new IllegalArgumentException("Invalid shape type: " + type);
+        }
+    }
 }

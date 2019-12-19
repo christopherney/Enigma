@@ -197,7 +197,7 @@ public class JavaCode {
     }
 
     /**
-     * Add a function into the class
+     * Add a function into the default class
      * @param functionCode Function to add
      * @throws ClassNotFoundException Throw is the main class is not found
      */
@@ -205,6 +205,12 @@ public class JavaCode {
         addFunction(functionCode, null);
     }
 
+    /**
+     * Add a function into a specific class
+     * @param functionCode Function to add
+     * @param className Class name where to add the function
+     * @throws ClassNotFoundException Throw is the main class is not found
+     */
     public void addFunction(String functionCode, String className) throws ClassNotFoundException {
         CodeBlock blockClass = null;
         for (CodeBlock block : getBlocksByType(CodeBlock.BlockType.Class)) {
@@ -222,7 +228,6 @@ public class JavaCode {
 
         blockClass.subBlocks.add(block);
     }
-
 
     /**
      * Insert positions for block of code
@@ -293,6 +298,11 @@ public class JavaCode {
         }
     }
 
+    /**
+     * Generate a fake Java code which is calling the fake attribute (avoid code clean by ProGuard)
+     * @param paramName  Name of this fake attribute
+     * @return Fake Java code
+     */
     private CodeBlock getFakeCode(String paramName) {
         String code = "\n        if (" + paramName + ".isEmpty()) " + paramName + ".getClass().toString();";
         JavaParser javaParser = new JavaParser();
@@ -302,37 +312,57 @@ public class JavaCode {
         return block;
     }
 
+    /**
+     * Generate a fake Java attribute
+     * @param paramName Name of this fake attribute
+     * @return Fake Java attribute
+     */
     private String getFakeAttribute(String paramName) {
         int sizeValue = Utils.getRandomNumberInRange(10, 30);
         String randomValue = TextUtils.getRandomString(sizeValue, KEY_CHARACTERS);
         return "public static final String " + paramName + " = \"" + randomValue + "\";";
     }
 
+    /**
+     * Encrypt all string values
+     * @param key Secrete key for encryption
+     * @param functionName Name of the decryption method
+     * @throws Exception Encryption error
+     */
     public void encryptStrings(String key, String functionName) throws Exception {
 
         int stringOffset = 0;
         CodeBlock block = null;
 
+        // For each String value:
         for (CodeString cs : getStringValues()) {
 
+            // Escape switch/case value (not authorized by Java compiler):
+            if (cs.isCaseValue) continue;
+
+            // Search the code block which contains the string value:
             if (block == null || !(block.getStart() <= cs.start && cs.end <= block.getEnd())) {
                 block = getBlockBetween(this.codeBlocks, cs.start, cs.end);
                 stringOffset = 0;
             }
 
+            // If code block found:
             if (block != null) {
                 int bStart = cs.start - (block.start + block.offset);
                 int bEnd = cs.end - (block.start + block.offset);
                 // System.out.println(cs.value + " == " + block.code.substring(bStart, bEnd));
 
+                // Get the string value en encrypt it:
                 String value = cs.value.substring(1, cs.value.length() - 1);
                 String encrypted = encryptString(value, key, functionName, null);
 
+                // Inject the Enigma signature function:
                 StringBuilder builder = new StringBuilder();
                 builder.append(block.code, 0, bStart + stringOffset);
                 builder.append(encrypted);
                 builder.append(block.code, bEnd  + stringOffset, block.code.length());
 
+                // Compute the length difference due to the code modification:
                 int originalLength = cs.value.length();
                 int encryptedLength = encrypted.length();
                 int lengthDiff = (encryptedLength - originalLength);
@@ -342,11 +372,19 @@ public class JavaCode {
                 // block.end += lengthDiff;
 
                 stringOffset += lengthDiff;
-
             }
         }
     }
 
+    /**
+     * Encrypt a string value, to Enigma ciphering style
+     * @param value String value to encrypt
+     * @param key Secrete key encryption
+     * @param functionName Name of the decryption method
+     * @param encryptTask Optional external decryption Task name (not yet implemented)
+     * @return String value encrypted with Enigma ciphering style
+     * @throws Exception Encryption error
+     */
     private String encryptString(String value, String key, String functionName, DefaultTask encryptTask) throws Exception {
         StringBuilder builder = new StringBuilder();
         value = value.replace("\\\"", "\"");
