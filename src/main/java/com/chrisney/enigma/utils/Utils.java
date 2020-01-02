@@ -70,8 +70,8 @@ public class Utils {
      * @param array Simple Array
      * @return ArrayList
      */
-    public static ArrayList toArrayList(Object[] array) {
-        ArrayList list = new ArrayList();
+    public static ArrayList<Object> toArrayList(Object[] array) {
+        ArrayList<Object> list = new ArrayList<>();
         for (Object o : array) {
             list.add(o);
         }

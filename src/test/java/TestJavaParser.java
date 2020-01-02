@@ -22,15 +22,16 @@ public class TestJavaParser {
         JavaParser javaParser = new JavaParser();
         JavaCode javaCode = javaParser.parse(code);
         CodeBlock blockImport = javaCode.getAllBlocks().get(0);
-        System.out.print(blockImport);
+
+        Assert.assertEquals(blockImport.type, CodeBlock.BlockType.Import);
+        Assert.assertEquals(blockImport.name, "com.chrisney.enigma.parser.JavaParser");
     }
 
     public static void testInsertArray() {
 
-        ArrayList array1 = Utils.toArrayList(new Integer[]{0, 1, 2, 3, 4, 5, 6});
-        ArrayList array2 = Utils.toArrayList(new Integer[]{0, 1, 2, 3, 99, 4, 5, 6});
-
+        ArrayList<Object> array1 = Utils.toArrayList(new Integer[]{0, 1, 2, 3, 4, 5, 6});
         Utils.insertInArray(array1, 4, 99);
+        ArrayList<Object> array2 = Utils.toArrayList(new Integer[]{0, 1, 2, 3, 99, 4, 5, 6});
 
         Assert.assertEquals(array1, array2);
     }
