@@ -48,7 +48,8 @@ public class TestJavaParser {
             // File javaFile = Utils.getFileResource("ToggleFlag.java");
             // File javaFile = Utils.getFileResource("GridBackupTable.java");
             // File javaFile = Utils.getFileResource("Folder.java");
-            File javaFile = Utils.getFileResource("Annotations.java");
+            // File javaFile = Utils.getFileResource("Annotations.java");
+            File javaFile = Utils.getFileResource("AnonymousInnerClass.java");
 
             String code = FileUtils.readFileToString(javaFile, "UTF-8");
 

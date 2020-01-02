@@ -252,21 +252,28 @@ public class JavaParser {
                     block.code = source.substring(block.start, block.end);
 
                     // Analyze sub source code:
-                    if (block.code.endsWith(String.valueOf(cCurlyBracketClose)) && !CodeBlock.isComment(currentBlock)) {
-                        int subCodeStart = startOfSubCode(block);
-                        int subCodeEnd = block.code.length() - 1;
-                        block.subCode = block.code.substring(subCodeStart, subCodeEnd);
+                    ArrayList<Integer[]> indexes = null;
+                    if (!CodeBlock.isComment(currentBlock)) indexes = getSubBlockIndexes(block);
 
-                        // Set block type:
-                        block.type = getBlockType(block);
-                        // Search block name and properties:
-                        parseBlockProperties(block);
+                    if (indexes != null && indexes.size() > 0) {
 
-                        // Compute the sub block offset (chars index):
-                        int subBlockOffset = block.start + block.offset + subCodeStart;
+                        for (Integer[] subItem : indexes) {
+                            int subCodeStart = subItem[0];
+                            int subCodeEnd = subItem[1];
 
-                        // Parse the sub block:
-                        block.subBlocks = this.parse(block.subCode, block, null, subBlockOffset);
+                            block.subCode = block.code.substring(subCodeStart, subCodeEnd);
+
+                            // Set block type:
+                            block.type = getBlockType(block);
+                            // Search block name and properties:
+                            parseBlockProperties(block);
+
+                            // Compute the sub block offset (chars index):
+                            int subBlockOffset = block.start + block.offset + subCodeStart;
+
+                            // Parse the sub block:
+                            block.subBlocks.addAll(this.parse(block.subCode, block, null, subBlockOffset));
+                        }
 
                     } else {
                         // Set block type:
@@ -314,20 +321,57 @@ public class JavaParser {
         return blocks;
     }
 
+    private ArrayList<Integer[]> getSubBlockIndexes(CodeBlock block) {
+        ArrayList<Integer[]> indexes = new ArrayList<>();
+        int j;
+        int counterCurlyBracket = 0;
+        char previousNoneEmptyChar = ' ';
+        for (j = 0; j < block.code.length(); j++) {
+
+            char c = block.code.charAt(j);
+
+            if (c == cCurlyBracketOpen) counterCurlyBracket++;
+            if (c == cCurlyBracketClose) counterCurlyBracket--;
+
+            if (c == cCurlyBracketOpen && counterCurlyBracket == 1 && previousNoneEmptyChar != cBracketClose) {
+                indexes.add(new Integer[] {j + 1, 0});
+            } else if (c == cCurlyBracketClose && counterCurlyBracket == 0 && indexes.size() > 0) {
+                indexes.get(indexes.size() -1)[1] = j - 1;
+            }
+
+            if (!TextUtils.isEmptyChar(c)) previousNoneEmptyChar = c;
+        }
+        return indexes;
+    }
+
     /**
      * Detect the start of sub code content
      * @param block Block of code
-     * @return Char index of start of the sub code
+     * @return Char index of the start of the sub code
      */
     private int startOfSubCode(CodeBlock block) {
         int j;
         char previousNoneEmptyChar = ' ';
         for (j = 0; j < block.code.length(); j++) {
             char c = block.code.charAt(j);
-            if (c == cCurlyBracketOpen && previousNoneEmptyChar != cBracketClose) break;
+            if (c == cCurlyBracketOpen && previousNoneEmptyChar != cBracketClose)
+                return j + 1;
             if (!TextUtils.isEmptyChar(c)) previousNoneEmptyChar = c;
         }
-        return j + 1;
+        return 0;
+    }
+
+    /**
+     * Detect end of sub code content
+     * @param block Block of code
+     * @return Char index of the end of the sub code
+     */
+    private int endOfSubCode(CodeBlock block) {
+        for (int i = block.code.length() - 1; i > 0; i--) {
+            char c = block.code.charAt(i);
+            if (c == cCurlyBracketClose) return i - 1;
+        }
+        return block.code.length() - 1;
     }
 
     /**
