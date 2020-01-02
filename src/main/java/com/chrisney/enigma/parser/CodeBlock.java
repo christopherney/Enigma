@@ -221,10 +221,11 @@ public class CodeBlock {
                 CodeBlock nextSubBlock = (subBlocks.size() > i + 1) ? subBlocks.get(i + 1) : null;
 
                 // Add code before sub block:
-                int prefixStart = (prevSubBlock != null) ? prevSubBlock.innerOffset + prevSubBlock.end : 0;
-                int prefixEnd = subBlock.innerOffset + subBlock.start;
-                String prefix = TextUtils.safeSubstring(code, prefixStart, prefixEnd);
-                if (prefix != null) sb.append(prefix);
+                if (i == 0) {
+                    int prefixEnd = subBlock.innerOffset + subBlock.start;
+                    String prefix = TextUtils.safeSubstring(code, 0, prefixEnd);
+                    if (prefix != null) sb.append(prefix);
+                }
 
                 // Add sub code:
                 sb.append(subBlock.toCode(level + 1));

@@ -51,19 +51,19 @@ public class TestJavaParser {
             // File javaFile = Utils.getFileResource("Annotations.java");
             File javaFile = Utils.getFileResource("AnonymousInnerClass.java");
 
-            String code = FileUtils.readFileToString(javaFile, "UTF-8");
+            String originalCode = FileUtils.readFileToString(javaFile, "UTF-8");
 
             JavaParser parser = new JavaParser();
-            JavaCode c = parser.parse(code);
+            JavaCode c = parser.parse(originalCode);
 
-            String stringCode = c.toCode();
+            String generatedCode = c.toCode();
 
             ArrayList<CodeString> stringValues = c.getStringValues();
             if (stringValues != null) {
                 System.out.println(stringValues.size());
             }
 
-            if (stringCode.trim().equals(code.trim())) {
+            if (generatedCode.trim().equals(originalCode.trim())) {
                 System.out.println("Parsing with success!");
             } else {
                 System.out.println("Failed parsing!");
