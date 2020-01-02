@@ -227,10 +227,6 @@ public class CodeBlock {
             // Close function (or class):
             if (hasSemicolonBlock) {
 
-                if (type == BlockType.AnonymousInnerClass) {
-                    // System.out.println("Is Annonymous inner class");
-                }
-
                 int max = code.length() - 1;
                 int i = max;
                 boolean foundSemicolon  = false;
