@@ -13,16 +13,19 @@ public class MyActivity extends Activity {
             }
         }, true);
 
-        this.fake_method(new MyListener() {
-                             public void onResult(boolean success) {
-                                 System.out.println(success);
-                             }
-                         }, 300,
+        this.fake_method(
                 new MyListener() {
                     public void onResult(boolean success) {
                         System.out.println(success);
                     }
-                }, false);
+                },
+                300,
+                new MyErrorListener() {
+                    public void onError(Exception error) {
+                        System.out.println(error);
+                    }
+                },
+                false
+        );
     }
-
 }
