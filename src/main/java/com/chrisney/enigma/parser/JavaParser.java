@@ -187,7 +187,7 @@ public class JavaParser {
                 } else if (string != null && currentBlock != CodeBlock.BlockType.StringValue) {
                     string.end = i + 1;
                     string.value = source.substring(string.start, string.end);
-                    string.isCaseValue = (block != null) ? isSwitchCaseValue(block.words, string.value, nextNoneEmptyChar) : false;
+                    string.isCaseValue = (block != null) && isSwitchCaseValue(block.words, string.value, nextNoneEmptyChar);
                     strings.add(string);
                     string = null;
                 }
@@ -428,7 +428,8 @@ public class JavaParser {
         CodeString prevNonEmptyWord = null;
         for (int i = words.size() - 1; i > 0; i--) {
             prevNonEmptyWord = words.get(i);
-            if (!TextUtils.isEmpty(prevNonEmptyWord.value) && prevNonEmptyWord.value.trim().length() > 0) break;
+            String v = prevNonEmptyWord.value;
+            if (!TextUtils.isEmpty(v) && !TextUtils.isSpace(v) && !TextUtils.isEqualsToChar(v, cDoubleQuote)) break;
         }
 
         if (prevNonEmptyWord == null) return false;

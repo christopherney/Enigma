@@ -34,7 +34,15 @@ public class TextUtils {
         return false;
     }
 
+    public static boolean isSpace(String s) {
+        return s != null && s.trim().length() == 0;
+    }
+
     public static boolean isReturnChar(Character c) {
         return c.equals('\r') || c.equals('\n') || c.equals(System.lineSeparator().charAt(0));
+    }
+
+    public static boolean isEqualsToChar(String s, char c) {
+        return s != null && s.charAt(0) == c;
     }
 }
