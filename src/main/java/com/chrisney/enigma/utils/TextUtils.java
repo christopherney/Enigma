@@ -92,4 +92,21 @@ public class TextUtils {
     public static boolean isEqualsToChar(String s, char c) {
         return s != null && s.charAt(0) == c;
     }
+
+    /**
+     * Safe substring to avoid String Index Out Of Bounds Exception
+     * @param value String to substring
+     * @param from From index to substring
+     * @param to To index to substring
+     * @return Return the substring value, or null
+     */
+    public static String safeSubstring(String value, int from, int to) {
+        int l = value.length();
+        if (l <= 0) return null;
+        if (from > -1 && to > -1 && to <= l && from < to) {
+            return value.substring(from, to);
+        } else {
+            return null;
+        }
+    }
 }

@@ -77,8 +77,8 @@ public class TestJavaParser {
 
             c.encryptStrings("LXeyH4qdtk2YqNDnLqZzX5HmPEwEwZEN", InjectCodeTask.FUNCTION_NAME);
 
-            stringCode = c.toCode();
-            System.out.println(stringCode);
+            // stringCode = c.toCode();
+           // System.out.println(stringCode);
 
         } catch (Exception ex) {
             ex.printStackTrace();

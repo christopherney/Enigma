@@ -252,32 +252,34 @@ public class JavaParser {
                     block.code = source.substring(block.start, block.end);
 
                     // Analyze sub source code:
-                    ArrayList<Integer[]> indexes = null;
-                    if (!CodeBlock.isComment(currentBlock)) indexes = getSubBlockIndexes(block);
+                    if (!CodeBlock.isComment(currentBlock))
+                        block.subIndexes = getSubBlockIndexes(block);
 
-                    if (indexes != null && indexes.size() > 0) {
+                    if (block.subIndexes != null && block.subIndexes.size() > 0) {
 
-                        for (Integer[] subItem : indexes) {
-                            int subCodeStart = subItem[0];
-                            int subCodeEnd = subItem[1];
+                        for (CodePosition subIndexes : block.subIndexes) {
 
-                            block.subCode = block.code.substring(subCodeStart, subCodeEnd);
+                            String subCode = block.code.substring(subIndexes.start, subIndexes.end);
 
                             // Set block type:
-                            block.type = getBlockType(block);
+                            block.type = getBlockType(block, true);
                             // Search block name and properties:
                             parseBlockProperties(block);
 
                             // Compute the sub block offset (chars index):
-                            int subBlockOffset = block.start + block.offset + subCodeStart;
+                            int subBlockOffset = block.start + block.offset + subIndexes.start;
 
                             // Parse the sub block:
-                            block.subBlocks.addAll(this.parse(block.subCode, block, null, subBlockOffset));
+                            ArrayList<CodeBlock> subBlocks = this.parse(subCode, block, null, subBlockOffset);
+                            for (CodeBlock subBlock : subBlocks) {
+                                subBlock.innerOffset = subIndexes.start;
+                            }
+                            block.subBlocks.addAll(subBlocks);
                         }
 
                     } else {
                         // Set block type:
-                        block.type = getBlockType(block);
+                        block.type = getBlockType(block, false);
                         // Search block name and properties:
                         parseBlockProperties(block);
                     }
@@ -321,8 +323,8 @@ public class JavaParser {
         return blocks;
     }
 
-    private ArrayList<Integer[]> getSubBlockIndexes(CodeBlock block) {
-        ArrayList<Integer[]> indexes = new ArrayList<>();
+    private ArrayList<CodePosition> getSubBlockIndexes(CodeBlock block) {
+        ArrayList<CodePosition> indexes = new ArrayList<>();
         int j;
         int counterCurlyBracket = 0;
         char previousNoneEmptyChar = ' ';
@@ -334,9 +336,9 @@ public class JavaParser {
             if (c == cCurlyBracketClose) counterCurlyBracket--;
 
             if (c == cCurlyBracketOpen && counterCurlyBracket == 1 && previousNoneEmptyChar != cBracketClose) {
-                indexes.add(new Integer[] {j + 1, 0});
+                indexes.add(new CodePosition(j + 1));
             } else if (c == cCurlyBracketClose && counterCurlyBracket == 0 && indexes.size() > 0) {
-                indexes.get(indexes.size() -1)[1] = j - 1;
+                indexes.get(indexes.size() -1).end = j - 1;
             }
 
             if (!TextUtils.isEmptyChar(c)) previousNoneEmptyChar = c;
@@ -561,9 +563,9 @@ public class JavaParser {
         return null;
     }
 
-    private CodeBlock.BlockType getBlockType(CodeBlock block) {
+    private CodeBlock.BlockType getBlockType(CodeBlock block, boolean hasSubCode) {
         // has nested code (function, condition, class...)
-        if (!TextUtils.isEmpty(block.subCode)) {
+        if (hasSubCode) {
 
             CodeString firstWord = getFirstNoneEmptyWord(block.words);
             if (firstWord == null) return CodeBlock.BlockType.Undefined;

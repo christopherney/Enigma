@@ -20,19 +20,20 @@ public class CodeBlock {
     public int end = -1;
 
     /**
-     * Start/End offset
+     * Start/End offset (from start of file)
      */
     public int offset = 0;
+
+
+    /**
+     * Inner offset (from start of parent)
+     */
+    public int innerOffset = 0;
 
     /**
      * Source code
      */
     public String code;
-
-    /**
-     * Sub source code (nested by function, class...)
-     */
-    public String subCode;
 
     /**
      * Black name for Class or function or Annotation
@@ -68,6 +69,11 @@ public class CodeBlock {
      * Indicate if the code block is nested or not.
      */
     public boolean hasParent = false;
+
+    /**
+     * Sub block position indexes
+     */
+    public ArrayList<CodePosition> subIndexes = null;
 
     /**
      * Type of the parent block
@@ -168,6 +174,10 @@ public class CodeBlock {
         return blockType == BlockType.Class || blockType == BlockType.AnonymousInnerClass;
     }
 
+    /**
+     * Return a String version of the object
+     * @return String which represent the code block
+     */
     @Override
     public String toString() {
         String m = "";
@@ -193,55 +203,44 @@ public class CodeBlock {
 
     /**
      * Generate the source code of the block
-     * @param tab Number of tab space to prepend
+     * @param level Level of the block
      * @return Source code of the block
      */
-    private String toCode(int tab) {
+    private String toCode(int level) {
 
         StringBuilder sb = new StringBuilder();
 
         if (!hasChildren()) {
             sb.append(code);
         } else {
+            // For each sub block:
+            for (int i = 0; i < subBlocks.size(); i++) {
 
-            boolean hasSemicolonBlock = code.trim().endsWith("}");
+                CodeBlock prevSubBlock = (i > 0) ? subBlocks.get(i - 1) : null;
+                CodeBlock subBlock = subBlocks.get(i);
+                CodeBlock nextSubBlock = (subBlocks.size() > i + 1) ? subBlocks.get(i + 1) : null;
 
-            // Print function (or class) signature:
-            if (hasSemicolonBlock) {
-                char c;
-                int i;
-                char prevNoneEmptyChar = ' ';
-                for (i = 0; i < code.length(); i++) {
-                    c = code.charAt(i);
-                    if (c == '{' && prevNoneEmptyChar != ']') break;
-                    if (!TextUtils.isEmptyChar(c)) prevNoneEmptyChar = c;
-                }
-                sb.append(code, 0, i + 1);
+                // Add code before sub block:
+                int prefixStart = (prevSubBlock != null) ? prevSubBlock.innerOffset + prevSubBlock.end : 0;
+                int prefixEnd = subBlock.innerOffset + subBlock.start;
+                String prefix = TextUtils.safeSubstring(code, prefixStart, prefixEnd);
+                if (prefix != null) sb.append(prefix);
+
+                // Add sub code:
+                sb.append(subBlock.toCode(level + 1));
+
+                // Add code between current sub block and next one:
+                int suffixStart = subBlock.innerOffset + subBlock.end;
+                int suffixEnd = (nextSubBlock != null) ? nextSubBlock.innerOffset + nextSubBlock.start : code.length();
+                String suffix = TextUtils.safeSubstring(code, suffixStart, suffixEnd);
+                if (suffix != null) sb.append(suffix);
+
             }
 
-            // Print content of function (or class):
-            for (CodeBlock subBlock : subBlocks) {
-                sb.append(subBlock.toCode(tab + 1));
-            }
-
-            // Close function (or class):
-            if (hasSemicolonBlock) {
-
-                int max = code.length() - 1;
-                int i = max;
-                boolean foundSemicolon  = false;
-                for (; i > 0; i--) {
-                    char c = code.charAt(i);
-                    if (!TextUtils.isEmptyChar(c) && foundSemicolon && i < max) break;
-                    if (c == '}') foundSemicolon = true;
-                }
-                String end = code.substring(i + 1);
-                sb.append(end);
-
-                // End Of File
-                if (!hasParent) sb.append("\n");
-            }
+            // End Of File
+            if (!hasParent) sb.append("\n");
         }
+
         return sb.toString();
     }
 }
