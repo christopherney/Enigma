@@ -345,36 +345,6 @@ public class JavaParser {
     }
 
     /**
-     * Detect the start of sub code content
-     * @param block Block of code
-     * @return Char index of the start of the sub code
-     */
-    private int startOfSubCode(CodeBlock block) {
-        int j;
-        char previousNoneEmptyChar = ' ';
-        for (j = 0; j < block.code.length(); j++) {
-            char c = block.code.charAt(j);
-            if (c == cCurlyBracketOpen && previousNoneEmptyChar != cBracketClose)
-                return j + 1;
-            if (!TextUtils.isEmptyChar(c)) previousNoneEmptyChar = c;
-        }
-        return 0;
-    }
-
-    /**
-     * Detect end of sub code content
-     * @param block Block of code
-     * @return Char index of the end of the sub code
-     */
-    private int endOfSubCode(CodeBlock block) {
-        for (int i = block.code.length() - 1; i > 0; i--) {
-            char c = block.code.charAt(i);
-            if (c == cCurlyBracketClose) return i - 1;
-        }
-        return block.code.length() - 1;
-    }
-
-    /**
      * Detect end of Line of code, End of Class, Function, Condition, Loop...
      * @param currentBlock Current block type
      * @param curChar Current character
