@@ -1,4 +1,5 @@
 import com.chrisney.enigma.parser.CodeBlock;
+import com.chrisney.enigma.parser.CodeString;
 import com.chrisney.enigma.parser.JavaCode;
 import com.chrisney.enigma.parser.JavaParser;
 import com.chrisney.enigma.tasks.InjectCodeTask;
@@ -45,7 +46,9 @@ public class TestJavaParser {
             // File javaFile = Utils.getFileResource("fadeAndRemoveEmptyScreen.java");
             // File javaFile = Utils.getFileResource("BaseFlags.java");
             // File javaFile = Utils.getFileResource("ToggleFlag.java");
-            File javaFile = Utils.getFileResource("GridBackupTable.java");
+            // File javaFile = Utils.getFileResource("GridBackupTable.java");
+            // File javaFile = Utils.getFileResource("Folder.java");
+            File javaFile = Utils.getFileResource("Annotations.java");
 
             String code = FileUtils.readFileToString(javaFile, "UTF-8");
 
@@ -53,6 +56,11 @@ public class TestJavaParser {
             JavaCode c = parser.parse(code);
 
             String stringCode = c.toCode();
+
+            ArrayList<CodeString> stringValues = c.getStringValues();
+            if (stringValues != null) {
+                System.out.println(stringValues.size());
+            }
 
             if (stringCode.trim().equals(code.trim())) {
                 System.out.println("Parsing with success!");

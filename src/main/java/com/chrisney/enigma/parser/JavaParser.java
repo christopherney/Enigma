@@ -153,6 +153,9 @@ public class JavaParser {
             Character curChar = source.charAt(i);
             Character nextChar = (i < source.length() - 1) ? source.charAt(i + 1) : ' ';
             Character nextNoneEmptyChar = getNextNoneEmptyChar(source, i + 1);
+            if (curChar.equals(cAnnotation)) {
+                System.out.println(curChar);
+            }
 
             // Track String values and comments blocks:
             if (currentBlock == CodeBlock.BlockType.Undefined) {
@@ -162,7 +165,7 @@ public class JavaParser {
                     currentBlock = CodeBlock.BlockType.CommentLine;
                 } else if (curChar.equals(cSlash) && nextChar.equals(cStar)) {
                     currentBlock = CodeBlock.BlockType.CommentBlock;
-                } else if (curChar.equals(cAnnotation) && counterParenthesis == 0 && word == null) {
+                } else if (curChar.equals(cAnnotation) && word == null) {
                     currentBlock = CodeBlock.BlockType.Annotation;
                 }
             } else if (currentBlock == CodeBlock.BlockType.StringValue) {
