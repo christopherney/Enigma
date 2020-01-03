@@ -191,14 +191,20 @@ public class JavaCode {
     }
 
     /**
-     * Add an attribute in the class
+     * Add an attribute in the class (or an interface)
      * @param attributeCode Attribute to add
-     * @throws ClassNotFoundException No Class found in the source code
+     * @throws ClassNotFoundException If the class (or interface) is not found
      */
     public void addAttribute(String attributeCode) throws ClassNotFoundException {
         addAttribute(attributeCode, null);
     }
 
+    /**
+     * Add an attribute in the class
+     * @param attributeCode Attribute to add
+     * @param className Class (or interface) where integrate the attribute
+     * @throws ClassNotFoundException If the class (or interface) is not found
+     */
     public void addAttribute(String attributeCode, String className) throws ClassNotFoundException {
         CodeBlock blockClass = null;
         CodeBlock.BlockType[] types = new CodeBlock.BlockType[] {
@@ -264,6 +270,11 @@ public class JavaCode {
         AtTheEnd
     }
 
+    /**
+     * Add a block of code at the first index into the blocks list
+     * @param blocks Code to edit
+     * @param newBlock Block of code to insert
+     */
     private void addBlockAtFirst(ArrayList<CodeBlock> blocks, CodeBlock newBlock) {
         newBlock.injected = true;
 
@@ -295,6 +306,11 @@ public class JavaCode {
         }
     }
 
+    /**
+     * Add a block of code at the end of blocks list
+     * @param blocks Code to edit
+     * @param newBlock Block of code to insert
+     */
     private void addBlockAtTheEnd(ArrayList<CodeBlock> blocks, CodeBlock newBlock) {
         newBlock.injected = true;
         if (UPDATE_OFFSETS) {
