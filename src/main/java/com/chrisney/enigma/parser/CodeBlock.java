@@ -295,8 +295,6 @@ public class CodeBlock {
                 if (suffix != null) sb.append(suffix);
             }
 
-            // End Of File
-            if (!hasParent) sb.append("\n");
         }
 
         return sb.toString();

@@ -10,8 +10,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Assert;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class TestJavaParser {
 
@@ -43,19 +43,34 @@ public class TestJavaParser {
     public static void testJavaParser() {
 
         try {
-            File directory = Paths.get(".").toAbsolutePath().toFile();
-            Git git = Git.cloneRepository()
-                    .setURI("https://android.googlesource.com/platform/packages/apps/Launcher3")
-                    .setDirectory(directory)
-                    .call();
+            String userHome = System.getProperty("user.home");
+
+            String repoPath = userHome + File.separator + "android-aosp-launcher3" + File.separator;
+            File repo = new File(repoPath);
+            if (!repo.exists()) repo.mkdir();
+
+            File src = new File(repoPath + File.separator + "src" + File.separator);
+            if (!src.exists()) {
+                Git git = Git.cloneRepository()
+                        .setURI("https://android.googlesource.com/platform/packages/apps/Launcher3")
+                        .setDirectory(repo)
+                        .call();
+            }
+
+            Collection<File> javaFiles = Utils.listFileTree(src, ".java");
+
+            for (File javaFile : javaFiles) {
+                testParseJavaFile(javaFile);
+            }
+
         } catch (GitAPIException e) {
             e.printStackTrace();
         }
-
-        File javaFile = Utils.getFileResource("Utils.java");
-        testParseJavaFile(javaFile);
     }
 
+    /**
+     * @param javaFile Java file to parse
+     */
     public static void testParseJavaFile(File javaFile) {
         try {
 
@@ -67,14 +82,11 @@ public class TestJavaParser {
             String generatedCode = c.toCode();
 
             ArrayList<CodeString> stringValues = c.getStringValues();
-            if (stringValues != null) {
-                System.out.println(stringValues.size());
-            }
 
             if (generatedCode.trim().equals(originalCode.trim())) {
-                System.out.println("Parsing with success!");
+                System.out.println("Parsing with success : " + javaFile.getAbsolutePath());
             } else {
-                System.out.println("Failed parsing!");
+                System.out.println("Failed parsing: " + javaFile.getAbsolutePath());
                 Assert.assertEquals(originalCode.trim(), generatedCode.trim());
             }
 
@@ -87,9 +99,9 @@ public class TestJavaParser {
             c.encryptStrings("LXeyH4qdtk2YqNDnLqZzX5HmPEwEwZEN", InjectCodeTask.FUNCTION_NAME);
 
             String securedCode = c.toCode();
-            System.out.println(securedCode);
 
         } catch (Exception ex) {
+            System.out.println(ex.getClass().getName() + ": " + javaFile.getAbsolutePath());
             ex.printStackTrace();
         }
     }

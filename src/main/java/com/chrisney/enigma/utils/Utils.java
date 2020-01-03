@@ -5,8 +5,7 @@ import com.chrisney.enigma.parser.JavaCode;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 import static org.gradle.internal.impldep.com.google.common.io.Resources.getResource;
 
@@ -14,6 +13,30 @@ import static org.gradle.internal.impldep.com.google.common.io.Resources.getReso
  * Various helper functions
  */
 public class Utils {
+
+    /**
+     * Recursive algorithm to list all files in directory
+     * @param dir Root directory to scan
+     * @param fileType Filter of file type to search (extension)
+     * @return All files found
+     */
+    public static Collection<File> listFileTree(File dir, String fileType) {
+        Set<File> fileTree = new HashSet<>();
+        if(dir == null || dir.listFiles() == null) {
+            return fileTree;
+        }
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File entry : files) {
+                if (entry.isFile() && entry.getName().endsWith(fileType)) {
+                    fileTree.add(entry);
+                } else {
+                    fileTree.addAll(listFileTree(entry, fileType));
+                }
+            }
+        }
+        return fileTree;
+    }
 
     /**
      * Return the file path of a resource

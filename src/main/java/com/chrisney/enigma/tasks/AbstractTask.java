@@ -1,5 +1,6 @@
 package com.chrisney.enigma.tasks;
 
+import com.chrisney.enigma.utils.Utils;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.Internal;
@@ -39,7 +40,7 @@ public class AbstractTask extends DefaultTask {
      */
     @Internal
     protected Collection<File> getAllJavaFiles() {
-        return this.listFileTree(new File(pathSrc), ".java");
+        return Utils.listFileTree(new File(pathSrc), ".java");
     }
 
     /**
@@ -49,31 +50,7 @@ public class AbstractTask extends DefaultTask {
      */
     @Internal
     protected Collection<File> getAllXmlFiles() {
-        return this.listFileTree(new File(pathSrc), ".xml");
-    }
-
-    /**
-     * Recursive algorithm to list all files in directory
-     * @param dir Root directory to scan
-     * @param fileType Filter of file type to search (extension)
-     * @return All files found
-     */
-    protected Collection<File> listFileTree(File dir, String fileType) {
-        Set<File> fileTree = new HashSet<>();
-        if(dir == null || dir.listFiles() == null) {
-            return fileTree;
-        }
-        File[] files = dir.listFiles();
-        if (files != null) {
-            for (File entry : files) {
-                if (entry.isFile() && entry.getName().endsWith(fileType)) {
-                    fileTree.add(entry);
-                } else {
-                    fileTree.addAll(listFileTree(entry, fileType));
-                }
-            }
-        }
-        return fileTree;
+        return Utils.listFileTree(new File(pathSrc), ".xml");
     }
 
     /**

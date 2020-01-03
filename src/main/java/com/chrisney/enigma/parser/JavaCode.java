@@ -193,19 +193,19 @@ public class JavaCode {
     /**
      * Add an attribute in the class (or an interface)
      * @param attributeCode Attribute to add
-     * @throws ClassNotFoundException If the class (or interface) is not found
+     * @return True if attribute added
      */
-    public void addAttribute(String attributeCode) throws ClassNotFoundException {
-        addAttribute(attributeCode, null);
+    public boolean addAttribute(String attributeCode) {
+        return addAttribute(attributeCode, null);
     }
 
     /**
      * Add an attribute in the class
      * @param attributeCode Attribute to add
      * @param className Class (or interface) where integrate the attribute
-     * @throws ClassNotFoundException If the class (or interface) is not found
+     * @return True if attribute added
      */
-    public void addAttribute(String attributeCode, String className) throws ClassNotFoundException {
+    public boolean addAttribute(String attributeCode, String className) {
         CodeBlock blockClass = null;
         CodeBlock.BlockType[] types = new CodeBlock.BlockType[] {
                 CodeBlock.BlockType.Class, CodeBlock.BlockType.Interface};
@@ -213,7 +213,7 @@ public class JavaCode {
             if (className == null || className.equals(block.name))
                 blockClass = block;
         }
-        if (blockClass == null) throw new ClassNotFoundException("Class '" + className + "' not found!");
+        if (blockClass == null) return false;
 
         JavaParser javaParser = new JavaParser();
         JavaCode javaCode = javaParser.parse("\n\n    " + attributeCode.trim());
@@ -224,24 +224,25 @@ public class JavaCode {
         if (!addBlockAtPosition(blockClass.subBlocks, block, InsertPosition.AtTheEnd, CodeBlock.BlockType.Attribute)) {
             addBlockAtFirst(blockClass.subBlocks, block);
         }
+        return true;
     }
 
     /**
      * Add a function into the default class
      * @param functionCode Function to add
-     * @throws ClassNotFoundException Throw is the main class is not found
+     * @return True if function added
      */
-    public void addFunction(String functionCode) throws ClassNotFoundException {
-        addFunction(functionCode, null);
+    public boolean addFunction(String functionCode) {
+        return addFunction(functionCode, null);
     }
 
     /**
      * Add a function into a specific class
      * @param functionCode Function to add
      * @param className Class name where to add the function
-     * @throws ClassNotFoundException Throw is the main class is not found
+     * @return True if function added
      */
-    public void addFunction(String functionCode, String className) throws ClassNotFoundException {
+    public boolean addFunction(String functionCode, String className) {
         CodeBlock blockClass = null;
         CodeBlock.BlockType[] types = new CodeBlock.BlockType[] {
                 CodeBlock.BlockType.Class, CodeBlock.BlockType.Interface};
@@ -249,7 +250,7 @@ public class JavaCode {
             if (className == null || className.equals(block.name))
                 blockClass = block;
         }
-        if (blockClass == null) throw new ClassNotFoundException("Class '" + className + "' not found!");
+        if (blockClass == null) return false;
 
         JavaParser javaParser = new JavaParser();
         JavaCode javaCode = javaParser.parse("\n\n    " + functionCode.trim());
@@ -259,6 +260,7 @@ public class JavaCode {
         block.parentType = blockClass.type;
 
         addBlockAtTheEnd(blockClass.subBlocks, block);
+        return true;
     }
 
     /**
@@ -385,28 +387,36 @@ public class JavaCode {
 
     /**
      * Inject fake code: fake attribute
+     * Important: only if a class exists into the JAVA code
      */
     public void injectFakeKeys() {
-        try {
-            ArrayList<CodeBlock> functions = getFunctions();
-            if (functions.size() > 0) {
-                String fakeParamName = TextUtils.getRandomString(10, PARAM_CHARACTERS);
+        ArrayList<CodeBlock> classBlocks = getBlocksByType(CodeBlock.BlockType.Class);
+        ArrayList<CodeBlock> functions = getFunctions();
 
-                String fakeAttribute = getFakeAttribute(fakeParamName);
-                addAttribute(fakeAttribute);
+        if (Utils.arrayNotEmpty(classBlocks) && Utils.arrayNotEmpty(functions)) {
 
-                CodeBlock fakeCode = getFakeCode(fakeParamName);
-                CodeBlock blockFunction = functions.get(0);
+            // Generate fake code:
+            String fakeParamName = TextUtils.getRandomString(10, PARAM_CHARACTERS);
+            String fakeAttribute = getFakeAttribute(fakeParamName);
+            CodeBlock fakeCode = getFakeCode(fakeParamName);
 
-                CodeBlock lastLineOfCode = blockFunction.subBlocks.get(blockFunction.subBlocks.size() - 1);
-                if (lastLineOfCode.type == CodeBlock.BlockType.Return) {
-                    addBlockAtFirst(blockFunction.subBlocks, fakeCode);
-                } else {
-                    addBlockAtTheEnd(blockFunction.subBlocks, fakeCode);
+            // Inject attribute:
+            addAttribute(fakeAttribute);
+
+            // Search a function where inject fake code:
+            for (CodeBlock blockFunction : functions) {
+
+                if (blockFunction.hasChildren()) {
+
+                    CodeBlock lastLineOfCode = blockFunction.subBlocks.last();
+                    if (lastLineOfCode.type == CodeBlock.BlockType.Return) {
+                        addBlockAtFirst(blockFunction.subBlocks, fakeCode);
+                    } else {
+                        addBlockAtTheEnd(blockFunction.subBlocks, fakeCode);
+                    }
+                    break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
         }
     }
 
@@ -565,6 +575,8 @@ public class JavaCode {
         for(CodeBlock block : getAllBlocks()) {
             if (!block.hasParent) sb.append(block.toCode());
         }
+        // End Of File
+        sb.append("\n");
         return sb.toString();
     }
 
