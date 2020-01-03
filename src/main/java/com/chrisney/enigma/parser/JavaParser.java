@@ -142,6 +142,7 @@ public class JavaParser {
         int counterCurlyBrackets = 0;
         int counterParenthesis = 0;
         int counterBrackets = 0;
+        int counterAnnotationParenthesis = 0;
 
         CodeBlock.BlockType currentBlock = CodeBlock.BlockType.Undefined;
 
@@ -164,7 +165,7 @@ public class JavaParser {
                     currentBlock = CodeBlock.BlockType.CommentLine;
                 } else if (curChar.equals(cSlash) && nextChar.equals(cStar)) {
                     currentBlock = CodeBlock.BlockType.CommentBlock;
-                } else if (curChar.equals(cAnnotation) && counterParenthesis == 0 && word == null) {
+                } else if (curChar.equals(cAnnotation) && counterAnnotationParenthesis == 0 && word == null) {
                     currentBlock = CodeBlock.BlockType.Annotation;
                 }
             } else if (currentBlock == CodeBlock.BlockType.StringValue) {
@@ -180,6 +181,10 @@ public class JavaParser {
                 if (curChar.equals(cParenthesisClose)) counterParenthesis--;
                 if (curChar.equals(cBracketOpen)) counterBrackets++;
                 if (curChar.equals(cBracketClose)) counterBrackets--;
+                if (currentBlock == CodeBlock.BlockType.Annotation) {
+                    if (curChar.equals(cParenthesisOpen)) counterAnnotationParenthesis++;
+                    if (curChar.equals(cParenthesisClose)) counterAnnotationParenthesis--;
+                }
             }
 
             // String value detection
@@ -316,7 +321,7 @@ public class JavaParser {
                 if (curChar.equals(cSlash) && prevChar.equals(cStar))
                     currentBlock = CodeBlock.BlockType.Undefined;
             } else if (currentBlock == CodeBlock.BlockType.Annotation) {
-                if (isEndAnnotation(currentBlock, curChar, nextNoneEmptyChar, counterParenthesis))
+                if (isEndAnnotation(currentBlock, curChar, nextNoneEmptyChar, counterAnnotationParenthesis))
                     currentBlock = CodeBlock.BlockType.Undefined;
             }
 

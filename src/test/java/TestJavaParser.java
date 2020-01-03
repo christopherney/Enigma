@@ -46,9 +46,9 @@ public class TestJavaParser {
             // File javaFile = Utils.getFileResource("fadeAndRemoveEmptyScreen.java");
             // File javaFile = Utils.getFileResource("BaseFlags.java");
             // File javaFile = Utils.getFileResource("ToggleFlag.java");
-            // File javaFile = Utils.getFileResource("GridBackupTable.java");
+             File javaFile = Utils.getFileResource("GridBackupTable.java");
             // File javaFile = Utils.getFileResource("Folder.java");
-            File javaFile = Utils.getFileResource("Annotations.java");
+            // File javaFile = Utils.getFileResource("Annotations.java");
             // File javaFile = Utils.getFileResource("AnonymousInnerClass.java");
 
             String originalCode = FileUtils.readFileToString(javaFile, "UTF-8");
@@ -75,7 +75,7 @@ public class TestJavaParser {
 
             c.injectFakeKeys();
 
-            // c.encryptStrings("LXeyH4qdtk2YqNDnLqZzX5HmPEwEwZEN", InjectCodeTask.FUNCTION_NAME);
+            c.encryptStrings("LXeyH4qdtk2YqNDnLqZzX5HmPEwEwZEN", InjectCodeTask.FUNCTION_NAME);
 
             String securedCode = c.toCode();
             System.out.println(securedCode);
