@@ -5,9 +5,12 @@ import com.chrisney.enigma.parser.JavaParser;
 import com.chrisney.enigma.tasks.InjectCodeTask;
 import com.chrisney.enigma.utils.Utils;
 import org.apache.commons.io.FileUtils;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Assert;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class TestJavaParser {
@@ -38,20 +41,23 @@ public class TestJavaParser {
     }
 
     public static void testJavaParser() {
-        try {
 
-            // File javaFile = Utils.getFileResource("Utils.java");
-            // File javaFile = Utils.getFileResource("FlingAnimation.java");
-            // File javaFile = Utils.getFileResource("Workspace.java");
-            // File javaFile = Utils.getFileResource("fadeAndRemoveEmptyScreen.java");
-            // File javaFile = Utils.getFileResource("BaseFlags.java");
-            // File javaFile = Utils.getFileResource("ToggleFlag.java");
-            // File javaFile = Utils.getFileResource("GridBackupTable.java");
-            // File javaFile = Utils.getFileResource("Folder.java");
-            // File javaFile = Utils.getFileResource("Annotations.java");
-            // File javaFile = Utils.getFileResource("AnonymousInnerClass.java");
-            // File javaFile = Utils.getFileResource("WorkspaceLayoutManager.java");
-            File javaFile = Utils.getFileResource("Launcher.java");
+        try {
+            File directory = Paths.get(".").toAbsolutePath().toFile();
+            Git git = Git.cloneRepository()
+                    .setURI("https://android.googlesource.com/platform/packages/apps/Launcher3")
+                    .setDirectory(directory)
+                    .call();
+        } catch (GitAPIException e) {
+            e.printStackTrace();
+        }
+
+        File javaFile = Utils.getFileResource("Utils.java");
+        testParseJavaFile(javaFile);
+    }
+
+    public static void testParseJavaFile(File javaFile) {
+        try {
 
             String originalCode = FileUtils.readFileToString(javaFile, "UTF-8");
 
@@ -69,6 +75,7 @@ public class TestJavaParser {
                 System.out.println("Parsing with success!");
             } else {
                 System.out.println("Failed parsing!");
+                Assert.assertEquals(originalCode.trim(), generatedCode.trim());
             }
 
             c.addImport("com.example.name");
