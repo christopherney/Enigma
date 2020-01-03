@@ -14,6 +14,14 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    test {
+        java {
+            srcDirs = ['src/test/java']
+        }
+    }
+}
+
 dependencies {
     implementation gradleApi()
     implementation localGroovy()
@@ -21,6 +29,12 @@ dependencies {
     implementation group: 'commons-io', name: 'commons-io', version: '2.5'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
     testImplementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.6.0.201912101111-r'
+}
+
+// Unit Tests:
+test {
+    useJUnit()
+    maxHeapSize = '1G'
 }
 
 apply plugin: 'maven'

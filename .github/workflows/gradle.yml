@@ -15,6 +15,8 @@ jobs:
         java-version: 1.8
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Unit Tests
+      run: ./gradlew test
     - name: Publish Gradle Plugin
       env:
         GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}

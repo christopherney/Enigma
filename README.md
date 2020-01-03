@@ -108,3 +108,8 @@ Bellow the options of Enigma plugin:
 * **enigma.classes** (array of strings) : let you defined the only classes to encrypt
 * **enigma.ignoredClasses** (array of strings): define the classes to not encrypt
 * **enigma.srcJava** (string): root path of your JAVA files (default: **/app/src/main/java**)
+
+
+## Unit Tests
+The JAVA parser is unit tested with more than 300 complex JAVA classes:
+* https://android.googlesource.com/platform/packages/apps/Launcher3/+/refs/heads/master/src/com/android/launcher3

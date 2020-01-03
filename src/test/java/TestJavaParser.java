@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,13 +16,8 @@ import java.util.Collection;
 
 public class TestJavaParser {
 
-    public static void main(String[] args) {
-        testImportParser();
-        testInsertArray();
-        testJavaParser();
-    }
-
-    public static void testImportParser() {
+    @Test
+    public void testImportParser() {
         String code = "\nimport com.chrisney.enigma.parser.JavaParser;";
         JavaParser javaParser = new JavaParser();
         JavaCode javaCode = javaParser.parse(code);
@@ -31,7 +27,8 @@ public class TestJavaParser {
         Assert.assertEquals(blockImport.name, "com.chrisney.enigma.parser.JavaParser");
     }
 
-    public static void testInsertArray() {
+    @Test
+    public void testInsertArray() {
 
         ArrayList<Object> array1 = Utils.toArrayList(new Integer[]{0, 1, 2, 3, 4, 5, 6});
         Utils.insertInArray(array1, 4, 99);
@@ -40,7 +37,8 @@ public class TestJavaParser {
         Assert.assertEquals(array1, array2);
     }
 
-    public static void testJavaParser() {
+    @Test
+    public void testJavaParser() throws Exception {
 
         try {
             String userHome = System.getProperty("user.home");
@@ -71,7 +69,7 @@ public class TestJavaParser {
     /**
      * @param javaFile Java file to parse
      */
-    public static void testParseJavaFile(File javaFile) {
+    private void testParseJavaFile(File javaFile) throws Exception {
         try {
 
             String originalCode = FileUtils.readFileToString(javaFile, "UTF-8");
@@ -102,7 +100,7 @@ public class TestJavaParser {
 
         } catch (Exception ex) {
             System.out.println(ex.getClass().getName() + ": " + javaFile.getAbsolutePath());
-            ex.printStackTrace();
+            throw ex;
         }
     }
 
