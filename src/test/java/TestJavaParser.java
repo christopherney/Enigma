@@ -50,7 +50,8 @@ public class TestJavaParser {
             // File javaFile = Utils.getFileResource("Folder.java");
             // File javaFile = Utils.getFileResource("Annotations.java");
             // File javaFile = Utils.getFileResource("AnonymousInnerClass.java");
-            File javaFile = Utils.getFileResource("WorkspaceLayoutManager.java");
+            // File javaFile = Utils.getFileResource("WorkspaceLayoutManager.java");
+            File javaFile = Utils.getFileResource("Launcher.java");
 
             String originalCode = FileUtils.readFileToString(javaFile, "UTF-8");
 

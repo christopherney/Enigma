@@ -266,7 +266,10 @@ public class JavaParser {
 
                         for (CodePosition subIndexes : block.subIndexes) {
 
-                            String subCode = block.code.substring(subIndexes.start, subIndexes.end);
+                            // Safe substring: important if method doesn't contains any sub code
+                            // Example:
+                            //      public void onStateTransitionStart(LauncherState toState) {}
+                            String subCode = TextUtils.safeSubstring(block.code, subIndexes.start, subIndexes.end);
 
                             // Set block type:
                             block.type = getBlockType(block, true);
@@ -277,11 +280,16 @@ public class JavaParser {
                             int subBlockOffset = block.start + block.offset + subIndexes.start;
 
                             // Parse the sub block:
-                            ArrayList<CodeBlock> subBlocks = this.parse(subCode, block, null, subBlockOffset);
-                            for (CodeBlock subBlock : subBlocks) {
-                                subBlock.innerOffset = subIndexes.start;
+                            if (subCode != null) {
+                                ArrayList<CodeBlock> subBlocks = this.parse(subCode, block, null, subBlockOffset);
+                                for (CodeBlock subBlock : subBlocks) {
+                                    subBlock.innerOffset = subIndexes.start;
+                                }
+                                block.subBlocks.addAll(subBlocks);
+                            } else {
+                                // If no sub code, then remove sub indexes:
+                                block.subIndexes = null;
                             }
-                            block.subBlocks.addAll(subBlocks);
                         }
 
                     } else {
