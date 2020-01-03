@@ -139,24 +139,34 @@ public class JavaCode {
      * @return Code blocks
      */
     public ArrayList<CodeBlock> getBlocksByType(CodeBlock.BlockType type) {
-        return getBlocksByType(type, this.rootCodeBlocks);
+        return getBlocksByType(new CodeBlock.BlockType[] {type}, this.rootCodeBlocks);
     }
 
     /**
+     * Return code blocks from types
+     * @param types Type of blocks
+     * @return Code blocks
+     */
+    public ArrayList<CodeBlock> getBlocksByTypes(CodeBlock.BlockType[] types) {
+        return getBlocksByType(types, this.rootCodeBlocks);
+    }
+
+
+    /**
      * Return code blocks from type (recursive)
-     * @param type Type of blocks
+     * @param types Types of block
      * @param blocks block (recursive)
      * @return Code blocks
      */
-    private ArrayList<CodeBlock> getBlocksByType(CodeBlock.BlockType type,  ArrayList<CodeBlock> blocks) {
+    private ArrayList<CodeBlock> getBlocksByType(CodeBlock.BlockType[] types,  ArrayList<CodeBlock> blocks) {
         if (blocks == null) return null;
         ArrayList<CodeBlock> result = new ArrayList<>();
         for (CodeBlock block : blocks) {
-            if (block.type == type) {
+            if (Utils.arrayContains(types, block.type)) {
                 result.add(block);
             }
             if (Utils.arrayNotEmpty(block.subBlocks)) {
-                ArrayList<CodeBlock> r = getBlocksByType(type, block.subBlocks);
+                ArrayList<CodeBlock> r = getBlocksByType(types, block.subBlocks);
                 if (Utils.arrayNotEmpty(r)) result.addAll(r);
             }
         }
@@ -191,7 +201,9 @@ public class JavaCode {
 
     public void addAttribute(String attributeCode, String className) throws ClassNotFoundException {
         CodeBlock blockClass = null;
-        for (CodeBlock block : getBlocksByType(CodeBlock.BlockType.Class)) {
+        CodeBlock.BlockType[] types = new CodeBlock.BlockType[] {
+                CodeBlock.BlockType.Class, CodeBlock.BlockType.Interface};
+        for (CodeBlock block : getBlocksByTypes(types)) {
             if (className == null || className.equals(block.name))
                 blockClass = block;
         }
@@ -201,7 +213,7 @@ public class JavaCode {
         JavaCode javaCode = javaParser.parse("\n\n    " + attributeCode.trim());
         CodeBlock block = javaCode.getAllBlocks().get(0);
         block.hasParent = true;
-        block.parentType = CodeBlock.BlockType.Class;
+        block.parentType = blockClass.type;
 
         if (!addBlockAtPosition(blockClass.subBlocks, block, InsertPosition.AtTheEnd, CodeBlock.BlockType.Attribute)) {
             addBlockAtFirst(blockClass.subBlocks, block);
@@ -225,7 +237,9 @@ public class JavaCode {
      */
     public void addFunction(String functionCode, String className) throws ClassNotFoundException {
         CodeBlock blockClass = null;
-        for (CodeBlock block : getBlocksByType(CodeBlock.BlockType.Class)) {
+        CodeBlock.BlockType[] types = new CodeBlock.BlockType[] {
+                CodeBlock.BlockType.Class, CodeBlock.BlockType.Interface};
+        for (CodeBlock block : getBlocksByTypes(types)) {
             if (className == null || className.equals(block.name))
                 blockClass = block;
         }

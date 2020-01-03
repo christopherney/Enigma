@@ -46,10 +46,11 @@ public class TestJavaParser {
             // File javaFile = Utils.getFileResource("fadeAndRemoveEmptyScreen.java");
             // File javaFile = Utils.getFileResource("BaseFlags.java");
             // File javaFile = Utils.getFileResource("ToggleFlag.java");
-             File javaFile = Utils.getFileResource("GridBackupTable.java");
+            // File javaFile = Utils.getFileResource("GridBackupTable.java");
             // File javaFile = Utils.getFileResource("Folder.java");
             // File javaFile = Utils.getFileResource("Annotations.java");
             // File javaFile = Utils.getFileResource("AnonymousInnerClass.java");
+            File javaFile = Utils.getFileResource("WorkspaceLayoutManager.java");
 
             String originalCode = FileUtils.readFileToString(javaFile, "UTF-8");
 

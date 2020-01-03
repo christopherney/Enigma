@@ -87,6 +87,29 @@ public class Utils {
     }
 
     /**
+     * Check if an item exists in a array
+     * @param array Array to analyse
+     * @param item Item to search
+     * @return True if item exists in the array
+     */
+    public static boolean arrayContains(Object[] array, Object item) {
+        return findIndexInArray(array, item) != -1;
+    }
+
+    /**
+     * Return the index of the element if it contains by the array, otherwise return -1
+     * @param array Array to analyse
+     * @param item Item to search
+     * @return Index of the element if it contains by the array, otherwise return -1
+     */
+    public static int findIndexInArray(Object[] array, Object item) {
+        for (int i = 0; i < array.length; i++) {
+            if (item.equals(array[i])) return i;
+        }
+        return -1;
+    }
+
+    /**
      * Check if an array if not empty (and not null).
      * @param arrayList Array to test
      * @return True if not null and not empty
