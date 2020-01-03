@@ -69,16 +69,16 @@ public class TestJavaParser {
                 System.out.println("Failed parsing!");
             }
 
-            c.addImport("com.example.package.name");
+      //      c.addImport("com.example.name");
             c.addFunction("public static boolean test(int value) { return value > 0; }");
-            c.addAttribute("public String mValueTest = \"Hello World\";");
+       //     c.addAttribute("public String mValueTest = \"Hello World\";");
 
-            c.injectFakeKeys();
+          //  c.injectFakeKeys();
 
-            c.encryptStrings("LXeyH4qdtk2YqNDnLqZzX5HmPEwEwZEN", InjectCodeTask.FUNCTION_NAME);
+     //       c.encryptStrings("LXeyH4qdtk2YqNDnLqZzX5HmPEwEwZEN", InjectCodeTask.FUNCTION_NAME);
 
-            // stringCode = c.toCode();
-           // System.out.println(stringCode);
+            String securedCode = c.toCode();
+            System.out.println(securedCode);
 
         } catch (Exception ex) {
             ex.printStackTrace();

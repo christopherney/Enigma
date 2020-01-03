@@ -140,6 +140,17 @@ public class CodeBlock {
     }
 
     /**
+     * Update the offset and position of the block from the previous block of the list.
+     * @param previousBlock Previous block of the list
+     */
+    public void updatePosition(CodeBlock previousBlock) {
+        this.start = previousBlock.end;
+        this.end = this.start + this.code.length();
+        this.offset = previousBlock.offset;
+        this.innerOffset = previousBlock.innerOffset;
+    }
+
+    /**
      * Indicate if the block is a line or block of comment
      * @return True if the block is a line or block of comment
      */

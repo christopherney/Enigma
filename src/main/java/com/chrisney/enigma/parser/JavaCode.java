@@ -14,9 +14,9 @@ import java.util.ArrayList;
 public class JavaCode {
 
     /**
-     * All blocks of codes
+     * Root blocks of codes
      */
-    private ArrayList<CodeBlock> codeBlocks;
+    private ArrayList<CodeBlock> rootCodeBlocks;
 
     /**
      * All String values
@@ -38,7 +38,7 @@ public class JavaCode {
      * @param sourceCode Original source code
      */
     public JavaCode(ArrayList<CodeBlock> blocks, ArrayList<CodeString> strings, String sourceCode) {
-        this.codeBlocks = blocks;
+        this.rootCodeBlocks = blocks;
         this.codeStrings = strings;
         this.sourceCode = sourceCode;
     }
@@ -56,7 +56,7 @@ public class JavaCode {
      * @return Code blocks
      */
     public ArrayList<CodeBlock> getAllBlocks() {
-        return this.getAllBlocks(this.codeBlocks);
+        return this.getAllBlocks(this.rootCodeBlocks);
     }
 
     /**
@@ -127,7 +127,7 @@ public class JavaCode {
      * @return Code blocks
      */
     public ArrayList<CodeBlock> getBlocksByType(CodeBlock.BlockType type) {
-        return getBlocksByType(type, this.codeBlocks);
+        return getBlocksByType(type, this.rootCodeBlocks);
     }
 
     /**
@@ -163,15 +163,15 @@ public class JavaCode {
         JavaCode javaCode = javaParser.parse(code);
         CodeBlock blockImport = javaCode.getImports().get(0);
 
-        if (!addBlockAtPosition(this.codeBlocks, blockImport, InsertPosition.AtTheEnd, CodeBlock.BlockType.Import)) {
-            addBlockAtPosition(this.codeBlocks, blockImport, InsertPosition.RightAfter, CodeBlock.BlockType.Package);
+        if (!addBlockAtPosition(this.rootCodeBlocks, blockImport, InsertPosition.AtTheEnd, CodeBlock.BlockType.Import)) {
+            addBlockAtPosition(this.rootCodeBlocks, blockImport, InsertPosition.RightAfter, CodeBlock.BlockType.Package);
         }
     }
 
     /**
      * Add an attribute in the class
      * @param attributeCode Attribute to add
-     * @throws ClassNotFoundException No Class found in the soucre code
+     * @throws ClassNotFoundException No Class found in the source code
      */
     public void addAttribute(String attributeCode) throws ClassNotFoundException {
         addAttribute(attributeCode, null);
@@ -192,7 +192,7 @@ public class JavaCode {
         block.parentType = CodeBlock.BlockType.Class;
 
         if (!addBlockAtPosition(blockClass.subBlocks, block, InsertPosition.AtTheEnd, CodeBlock.BlockType.Attribute)) {
-            Utils.insertInArray(blockClass.subBlocks, 0, block);
+            addBlockAtFirst(blockClass.subBlocks, block);
         }
     }
 
@@ -226,7 +226,7 @@ public class JavaCode {
         block.type = CodeBlock.BlockType.Function;
         block.parentType = blockClass.type;
 
-        blockClass.subBlocks.add(block);
+        addBlockAtTheEnd(blockClass.subBlocks, block);
     }
 
     /**
@@ -238,6 +238,40 @@ public class JavaCode {
         AtTheEnd
     }
 
+    private void addBlockAtFirst(ArrayList<CodeBlock> blocks, CodeBlock newBlock) {
+        if (blocks.size() > 0) {
+            CodeBlock firstBlock = blocks.get(0);
+            newBlock.start = 0;
+            newBlock.end = newBlock.code.length();
+            newBlock.offset = firstBlock.offset;
+            newBlock.innerOffset = firstBlock.innerOffset;
+
+            Utils.insertInArray(blocks, 0, newBlock);
+
+            for (int i = 1; i < blocks.size(); i++) {
+                // Shift block offsets:
+                CodeBlock block = blocks.get(i);
+                block.start = block.start + newBlock.code.length();
+                block.end = block.end + newBlock.code.length();
+            }
+        } else {
+            newBlock.start = 0;
+            newBlock.end = newBlock.code.length();
+
+            Utils.insertInArray(blocks, 0, newBlock);
+        }
+    }
+
+    private void addBlockAtTheEnd(ArrayList<CodeBlock> blocks, CodeBlock newBlock) {
+        if (blocks.size() > 0) {
+            CodeBlock lastBlock = blocks.get(blocks.size() - 1);
+            newBlock.updatePosition(lastBlock);
+        } else {
+            newBlock.end = newBlock.code.length();
+        }
+        blocks.add(newBlock);
+    }
+
     /**
      * Add a block of code into the entire code.
      * @param blocks Code to edit
@@ -246,29 +280,51 @@ public class JavaCode {
      * @param type Type to insert new block
      */
     private boolean addBlockAtPosition(ArrayList<CodeBlock> blocks, CodeBlock newBlock, InsertPosition position, CodeBlock.BlockType type) {
+        boolean inserted = false;
+
         if (position == InsertPosition.AtTheEnd) {
             for (int i = blocks.size() - 1; i > 0; i--) {
+
                 CodeBlock block = blocks.get(i);
-                if (block.type == type) {
+
+                // Insert new block ar right position:
+                if (!inserted && block.type == type) {
+                    newBlock.updatePosition(block);
                     Utils.insertInArray(blocks, i + 1, newBlock);
-                    return true;
+                    i++;
+                    inserted = true;
+                } else if (inserted) {
+                    // Shift block offsets:
+                    block.start = block.start + newBlock.code.length();
+                    block.end = block.end + newBlock.code.length();
                 }
             }
         } else {
             for (int i = 0; i < blocks.size(); i++) {
+
                 CodeBlock block = blocks.get(i);
-                if (block.type == type) {
+
+                // Insert new block at right position:
+                if (!inserted && block.type == type) {
                     if (position == InsertPosition.JustBefore) {
+                        newBlock.updatePosition(block);
                         Utils.insertInArray(blocks, i, newBlock);
-                        return true;
+                        inserted = true;
                     } else if (position == InsertPosition.RightAfter) {
+                        newBlock.updatePosition(block);
                         Utils.insertInArray(blocks, i + 1, newBlock);
-                        return true;
+                        i++;
+                        inserted = true;
                     }
+                } else if (inserted) {
+                    // Shift block offsets:
+                    block.start = block.start + newBlock.code.length();
+                    block.end = block.end + newBlock.code.length();
                 }
             }
         }
-        return false;
+
+        return inserted;
     }
 
     /**
@@ -288,9 +344,9 @@ public class JavaCode {
 
                 CodeBlock lastLineOfCode = blockFunction.subBlocks.get(blockFunction.subBlocks.size() - 1);
                 if (lastLineOfCode.type == CodeBlock.BlockType.Return) {
-                    Utils.insertInArray(blockFunction.subBlocks, 0, fakeCode);
+                    addBlockAtFirst(blockFunction.subBlocks, fakeCode);
                 } else {
-                    blockFunction.subBlocks.add(fakeCode);
+                    addBlockAtTheEnd(blockFunction.subBlocks, fakeCode);
                 }
             }
         } catch (ClassNotFoundException ex) {
@@ -342,7 +398,7 @@ public class JavaCode {
 
             // Search the code block which contains the string value:
             if (block == null || !(block.getStart() <= cs.start && cs.end <= block.getEnd())) {
-                block = getBlockBetween(this.codeBlocks, cs.start, cs.end);
+                block = getBlockBetween(this.rootCodeBlocks, cs.start, cs.end);
                 stringOffset = 0;
             }
 
@@ -459,8 +515,8 @@ public class JavaCode {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        if (this.codeBlocks != null) {
-            for(CodeBlock block : this.codeBlocks) {
+        if (this.rootCodeBlocks != null) {
+            for(CodeBlock block : this.rootCodeBlocks) {
                 sb.append(block.code);
             }
         }
