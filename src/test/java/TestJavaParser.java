@@ -48,8 +48,8 @@ public class TestJavaParser {
             // File javaFile = Utils.getFileResource("ToggleFlag.java");
             // File javaFile = Utils.getFileResource("GridBackupTable.java");
             // File javaFile = Utils.getFileResource("Folder.java");
-            // File javaFile = Utils.getFileResource("Annotations.java");
-            File javaFile = Utils.getFileResource("AnonymousInnerClass.java");
+            File javaFile = Utils.getFileResource("Annotations.java");
+            // File javaFile = Utils.getFileResource("AnonymousInnerClass.java");
 
             String originalCode = FileUtils.readFileToString(javaFile, "UTF-8");
 
@@ -69,13 +69,13 @@ public class TestJavaParser {
                 System.out.println("Failed parsing!");
             }
 
-      //      c.addImport("com.example.name");
+            c.addImport("com.example.name");
             c.addFunction("public static boolean test(int value) { return value > 0; }");
-       //     c.addAttribute("public String mValueTest = \"Hello World\";");
+            c.addAttribute("public String mValueTest = \"Hello World\";");
 
-          //  c.injectFakeKeys();
+            c.injectFakeKeys();
 
-     //       c.encryptStrings("LXeyH4qdtk2YqNDnLqZzX5HmPEwEwZEN", InjectCodeTask.FUNCTION_NAME);
+            // c.encryptStrings("LXeyH4qdtk2YqNDnLqZzX5HmPEwEwZEN", InjectCodeTask.FUNCTION_NAME);
 
             String securedCode = c.toCode();
             System.out.println(securedCode);

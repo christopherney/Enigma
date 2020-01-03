@@ -1,6 +1,8 @@
 package com.chrisney.enigma.parser;
 
+import com.chrisney.enigma.utils.SmartArrayList;
 import com.chrisney.enigma.utils.TextUtils;
+import com.chrisney.enigma.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -255,7 +257,7 @@ public class JavaParser {
                     if (!CodeBlock.isComment(currentBlock))
                         block.subIndexes = getSubBlockIndexes(block);
 
-                    if (block.subIndexes != null && block.subIndexes.size() > 0) {
+                    if (Utils.arrayNotEmpty(block.subIndexes)) {
 
                         for (CodePosition subIndexes : block.subIndexes) {
 
@@ -323,8 +325,8 @@ public class JavaParser {
         return blocks;
     }
 
-    private ArrayList<CodePosition> getSubBlockIndexes(CodeBlock block) {
-        ArrayList<CodePosition> indexes = new ArrayList<>();
+    private SmartArrayList<CodePosition> getSubBlockIndexes(CodeBlock block) {
+        SmartArrayList<CodePosition> indexes = new SmartArrayList<>();
         int j;
         int counterCurlyBracket = 0;
         char previousNoneEmptyChar = ' ';

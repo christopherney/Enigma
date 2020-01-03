@@ -85,4 +85,13 @@ public class Utils {
     public static String randomHashKey() {
         return TextUtils.getRandomString(32, JavaCode.KEY_CHARACTERS);
     }
+
+    /**
+     * Check if an array if not empty (and not null).
+     * @param arrayList Array to test
+     * @return True if not null and not empty
+     */
+    public static boolean arrayNotEmpty(ArrayList arrayList) {
+        return arrayList != null && arrayList.size() > 0;
+    }
 }

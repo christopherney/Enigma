@@ -14,6 +14,21 @@ import java.util.ArrayList;
 public class JavaCode {
 
     /**
+     * Enable or disable the position/offset update mechanism.
+     */
+    public static final boolean UPDATE_OFFSETS = false;
+
+    /**
+     * Characters for random secrete key generation
+     */
+    public static final String KEY_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789qwertyuiopasdfghjklzxcvbnm#$*!?";
+
+    /**
+     * Characters for random attribute name
+     */
+    public static final String PARAM_CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+
+    /**
      * Root blocks of codes
      */
     private ArrayList<CodeBlock> rootCodeBlocks;
@@ -27,9 +42,6 @@ public class JavaCode {
      * Original source code
      */
     private String sourceCode;
-
-    public static final String KEY_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789qwertyuiopasdfghjklzxcvbnm#$*!?";
-    public static final String PARAM_CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
 
     /**
      * Constructor
@@ -69,9 +81,9 @@ public class JavaCode {
         ArrayList<CodeBlock> result = new ArrayList<>();
         for (CodeBlock block : blocks) {
             result.add(block);
-            if (block.subBlocks != null && block.subBlocks.size() > 0) {
+            if (Utils.arrayNotEmpty(block.subBlocks)) {
                 ArrayList<CodeBlock> r = getAllBlocks(block.subBlocks);
-                if (r != null && r.size() > 0) result.addAll(r);
+                if (Utils.arrayNotEmpty(r)) result.addAll(r);
             }
         }
         return result;
@@ -86,7 +98,7 @@ public class JavaCode {
      */
     private CodeBlock getBlockBetween(ArrayList<CodeBlock> blocks, int start, int end) {
         for (CodeBlock block : blocks) {
-            if (block.subBlocks != null && block.subBlocks.size() > 0) {
+            if (Utils.arrayNotEmpty(block.subBlocks)) {
                 CodeBlock b = getBlockBetween(block.subBlocks, start, end);
                 if (b != null) return b;
             } else if (block.getStart() <= start && end <= block.getEnd()) {
@@ -143,9 +155,9 @@ public class JavaCode {
             if (block.type == type) {
                 result.add(block);
             }
-            if (block.subBlocks != null && block.subBlocks.size() > 0) {
+            if (Utils.arrayNotEmpty(block.subBlocks)) {
                 ArrayList<CodeBlock> r = getBlocksByType(type, block.subBlocks);
-                if (r != null && r.size() > 0) result.addAll(r);
+                if (Utils.arrayNotEmpty(r)) result.addAll(r);
             }
         }
         return result;
@@ -239,35 +251,45 @@ public class JavaCode {
     }
 
     private void addBlockAtFirst(ArrayList<CodeBlock> blocks, CodeBlock newBlock) {
+        newBlock.injected = true;
+
         if (blocks.size() > 0) {
-            CodeBlock firstBlock = blocks.get(0);
-            newBlock.start = 0;
-            newBlock.end = newBlock.code.length();
-            newBlock.offset = firstBlock.offset;
-            newBlock.innerOffset = firstBlock.innerOffset;
+            if (UPDATE_OFFSETS) {
+                CodeBlock firstBlock = blocks.get(0);
+                newBlock.start = 0;
+                newBlock.end = newBlock.code.length();
+                newBlock.offset = firstBlock.offset;
+                newBlock.innerOffset = firstBlock.innerOffset;
+            }
 
             Utils.insertInArray(blocks, 0, newBlock);
 
-            for (int i = 1; i < blocks.size(); i++) {
-                // Shift block offsets:
-                CodeBlock block = blocks.get(i);
-                block.start = block.start + newBlock.code.length();
-                block.end = block.end + newBlock.code.length();
+            if (UPDATE_OFFSETS) {
+                for (int i = 1; i < blocks.size(); i++) {
+                    // Shift block offsets:
+                    CodeBlock block = blocks.get(i);
+                    block.start = block.start + newBlock.code.length();
+                    block.end = block.end + newBlock.code.length();
+                }
             }
         } else {
-            newBlock.start = 0;
-            newBlock.end = newBlock.code.length();
-
+            if (UPDATE_OFFSETS) {
+                newBlock.start = 0;
+                newBlock.end = newBlock.code.length();
+            }
             Utils.insertInArray(blocks, 0, newBlock);
         }
     }
 
     private void addBlockAtTheEnd(ArrayList<CodeBlock> blocks, CodeBlock newBlock) {
-        if (blocks.size() > 0) {
-            CodeBlock lastBlock = blocks.get(blocks.size() - 1);
-            newBlock.updatePosition(lastBlock);
-        } else {
-            newBlock.end = newBlock.code.length();
+        newBlock.injected = true;
+        if (UPDATE_OFFSETS) {
+            if (blocks.size() > 0) {
+                CodeBlock lastBlock = blocks.get(blocks.size() - 1);
+                newBlock.updatePosition(lastBlock);
+            } else {
+                newBlock.end = newBlock.code.length();
+            }
         }
         blocks.add(newBlock);
     }
@@ -281,6 +303,7 @@ public class JavaCode {
      */
     private boolean addBlockAtPosition(ArrayList<CodeBlock> blocks, CodeBlock newBlock, InsertPosition position, CodeBlock.BlockType type) {
         boolean inserted = false;
+        newBlock.injected = true;
 
         if (position == InsertPosition.AtTheEnd) {
             for (int i = blocks.size() - 1; i > 0; i--) {
@@ -289,8 +312,9 @@ public class JavaCode {
 
                 // Insert new block ar right position:
                 if (!inserted && block.type == type) {
-                    newBlock.updatePosition(block);
+                    if (UPDATE_OFFSETS) newBlock.updatePosition(block);
                     Utils.insertInArray(blocks, i + 1, newBlock);
+                    if (!UPDATE_OFFSETS) return true;
                     i++;
                     inserted = true;
                 } else if (inserted) {
@@ -307,12 +331,14 @@ public class JavaCode {
                 // Insert new block at right position:
                 if (!inserted && block.type == type) {
                     if (position == InsertPosition.JustBefore) {
-                        newBlock.updatePosition(block);
+                        if (UPDATE_OFFSETS) newBlock.updatePosition(block);
                         Utils.insertInArray(blocks, i, newBlock);
+                        if (!UPDATE_OFFSETS) return true;
                         inserted = true;
                     } else if (position == InsertPosition.RightAfter) {
-                        newBlock.updatePosition(block);
+                        if (UPDATE_OFFSETS) newBlock.updatePosition(block);
                         Utils.insertInArray(blocks, i + 1, newBlock);
+                        if (!UPDATE_OFFSETS) return true;
                         i++;
                         inserted = true;
                     }

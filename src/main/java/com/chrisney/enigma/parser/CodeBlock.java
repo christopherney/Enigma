@@ -1,6 +1,8 @@
 package com.chrisney.enigma.parser;
 
+import com.chrisney.enigma.utils.SmartArrayList;
 import com.chrisney.enigma.utils.TextUtils;
+import com.chrisney.enigma.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -58,7 +60,7 @@ public class CodeBlock {
     /**
      * Sub blocks of code contains by the current block
      */
-    public ArrayList<CodeBlock> subBlocks = new ArrayList<>();
+    public SmartArrayList<CodeBlock> subBlocks = new SmartArrayList<>();
 
     /**
      * Source code of the block split in words (useful for processing)
@@ -73,12 +75,17 @@ public class CodeBlock {
     /**
      * Sub block position indexes
      */
-    public ArrayList<CodePosition> subIndexes = null;
+    public SmartArrayList<CodePosition> subIndexes = null;
 
     /**
      * Type of the parent block
      */
     public CodeBlock.BlockType parentType = BlockType.Undefined;
+
+    /**
+     * Indicate if the code block is injected by programming code.
+     */
+    public boolean injected = false;
 
     /**
      * Modifiers (for class attributes and functions)
@@ -197,11 +204,39 @@ public class CodeBlock {
     }
 
     /**
-     * Indicate if the block has children or not.
+     * Indicate if the block has children or not
      * @return True if the block has children
      */
     public boolean hasChildren() {
-        return subBlocks != null && subBlocks.size() > 0;
+        return Utils.arrayNotEmpty(subBlocks);
+    }
+
+    /**
+     * Return the first sub block none injected by programming
+     * @return First sub block none injected by programming
+     */
+    private CodeBlock getFirstNoneInjectedBlock() {
+        if (Utils.arrayNotEmpty(this.subBlocks)) {
+            for (int i = 0; i < this.subBlocks.size(); i++) {
+                CodeBlock block = this.subBlocks.get(i);
+                if (!block.injected) return block;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Return the latest sub block none injected by programming
+     * @return Latest sub block none injected by programming
+     */
+    private CodeBlock getLastNoneInjectedBlock() {
+        if (Utils.arrayNotEmpty(this.subBlocks)) {
+            for (int i = this.subBlocks.size() - 1; i >= 0; i--) {
+                CodeBlock block = this.subBlocks.get(i);
+                if (!block.injected) return block;
+            }
+        }
+        return null;
     }
 
     /**
@@ -224,29 +259,40 @@ public class CodeBlock {
         if (!hasChildren()) {
             sb.append(code);
         } else {
+
+            // Add signature code:
+            CodeBlock firstBLock = getFirstNoneInjectedBlock();
+            if (firstBLock != null) {
+                int prefixEnd = firstBLock.innerOffset + firstBLock.start;
+                String prefix = TextUtils.safeSubstring(code, 0, prefixEnd);
+                if (prefix != null) sb.append(prefix);
+            }
+
             // For each sub block:
             for (int i = 0; i < subBlocks.size(); i++) {
 
-                CodeBlock prevSubBlock = (i > 0) ? subBlocks.get(i - 1) : null;
                 CodeBlock subBlock = subBlocks.get(i);
-                CodeBlock nextSubBlock = (subBlocks.size() > i + 1) ? subBlocks.get(i + 1) : null;
-
-                // Add code before sub block:
-                if (i == 0) {
-                    int prefixEnd = subBlock.innerOffset + subBlock.start;
-                    String prefix = TextUtils.safeSubstring(code, 0, prefixEnd);
-                    if (prefix != null) sb.append(prefix);
-                }
+                CodeBlock nextSubBlock = subBlocks.next(i);
 
                 // Add sub code:
                 sb.append(subBlock.toCode(level + 1));
 
                 // Add code between current sub block and next one:
-                int suffixStart = subBlock.innerOffset + subBlock.end;
-                int suffixEnd = (nextSubBlock != null) ? nextSubBlock.innerOffset + nextSubBlock.start : code.length();
+                if (!subBlock.injected && i < subBlocks.lastIndex()) {
+                    int suffixStart = subBlock.innerOffset + subBlock.end;
+                    int suffixEnd = (nextSubBlock != null) ? nextSubBlock.innerOffset + nextSubBlock.start : code.length();
+                    String suffix = TextUtils.safeSubstring(code, suffixStart, suffixEnd);
+                    if (suffix != null) sb.append(suffix);
+                }
+            }
+
+            // Close the block:
+            CodeBlock latestBlock = getLastNoneInjectedBlock();
+            if (latestBlock != null) {
+                int suffixStart = latestBlock.innerOffset + latestBlock.end;
+                int suffixEnd = code.length();
                 String suffix = TextUtils.safeSubstring(code, suffixStart, suffixEnd);
                 if (suffix != null) sb.append(suffix);
-
             }
 
             // End Of File
