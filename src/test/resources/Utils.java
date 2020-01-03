@@ -2,7 +2,6 @@ package com.proto.helloworld.helpers;
 
 import android.annotation.SuppressLint;
 import android.util.Log;
-import com.example.package.name;
 
 /**
  * Utilities

@@ -19,16 +19,6 @@ public class JavaCode {
     public static final boolean UPDATE_OFFSETS = false;
 
     /**
-     * Characters for random secrete key generation
-     */
-    public static final String KEY_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789qwertyuiopasdfghjklzxcvbnm#$*!?";
-
-    /**
-     * Characters for random attribute name
-     */
-    public static final String PARAM_CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
-
-    /**
      * Root blocks of codes
      */
     private ArrayList<CodeBlock> rootCodeBlocks;
@@ -390,14 +380,28 @@ public class JavaCode {
      * Important: only if a class exists into the JAVA code
      */
     public void injectFakeKeys() {
+        String fakeParamName = TextUtils.getRandomString(10, TextUtils.PARAM_CHARACTERS);
+
+        int sizeValue = Utils.getRandomNumberInRange(10, 30);
+        String randomValue = TextUtils.getRandomString(sizeValue, TextUtils.KEY_CHARACTERS);
+
+        injectFakeKeys(fakeParamName, randomValue);
+    }
+
+    /**
+     * Inject fake code: fake attribute
+     * Important: only if a class exists into the JAVA code
+     * @param fakeParamName Attribute name
+     * @param randomValue Attribute value
+     */
+    public void injectFakeKeys(String fakeParamName, String randomValue) {
         ArrayList<CodeBlock> classBlocks = getBlocksByType(CodeBlock.BlockType.Class);
         ArrayList<CodeBlock> functions = getFunctions();
 
         if (Utils.arrayNotEmpty(classBlocks) && Utils.arrayNotEmpty(functions)) {
 
             // Generate fake code:
-            String fakeParamName = TextUtils.getRandomString(10, PARAM_CHARACTERS);
-            String fakeAttribute = getFakeAttribute(fakeParamName);
+            String fakeAttribute = getFakeAttribute(fakeParamName, randomValue);
             CodeBlock fakeCode = getFakeCode(fakeParamName);
 
             // Inject attribute:
@@ -439,9 +443,7 @@ public class JavaCode {
      * @param paramName Name of this fake attribute
      * @return Fake Java attribute
      */
-    private String getFakeAttribute(String paramName) {
-        int sizeValue = Utils.getRandomNumberInRange(10, 30);
-        String randomValue = TextUtils.getRandomString(sizeValue, KEY_CHARACTERS);
+    private String getFakeAttribute(String paramName, String randomValue) {
         return "public static final String " + paramName + " = \"" + randomValue + "\";";
     }
 

@@ -8,6 +8,16 @@ import java.util.Random;
 public class TextUtils {
 
     /**
+     * Characters for random secrete key generation
+     */
+    public static final String KEY_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789qwertyuiopasdfghjklzxcvbnm#$*!?";
+
+    /**
+     * Characters for random attribute name
+     */
+    public static final String PARAM_CHARACTERS ="ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+
+    /**
      * Check if a string ends with a specific character
      * @param value String to test
      * @param character Specific character

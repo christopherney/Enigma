@@ -3,6 +3,8 @@ import com.chrisney.enigma.parser.CodeString;
 import com.chrisney.enigma.parser.JavaCode;
 import com.chrisney.enigma.parser.JavaParser;
 import com.chrisney.enigma.tasks.InjectCodeTask;
+import com.chrisney.enigma.utils.AESUtils;
+import com.chrisney.enigma.utils.TextUtils;
 import com.chrisney.enigma.utils.Utils;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
@@ -14,7 +16,49 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class TestJavaParser {
+public class UnitTests {
+
+    @Test
+    public void encryption() throws Exception {
+
+        String key = Utils.randomHashKey();
+
+        for (int i = 0; i < 100; i++) {
+
+            int valueSize = Utils.getRandomNumberInRange(10, 100);
+
+            String value = TextUtils.getRandomString(valueSize, TextUtils.KEY_CHARACTERS);
+
+            String encrypted = AESUtils.encrypt(key, value);
+
+            String decrypted = AESUtils.decrypt(key, encrypted);
+
+            Assert.assertEquals(value, decrypted);
+        }
+    }
+
+    @Test
+    public void testEnigmatization() throws Exception {
+
+        File javaFile = Utils.getFileResource("Utils.java");
+        String originalCode = FileUtils.readFileToString(javaFile, "UTF-8");
+
+        JavaParser parser = new JavaParser();
+        JavaCode c = parser.parse(originalCode);
+
+        c.addImport(InjectCodeTask.IMPORT_NAME);
+
+        c.injectFakeKeys("DMNGZONJKU", "moyvMeX1ESB3Q");
+
+        c.encryptStrings("LXeyH4qdtk2YqNDnLqZzX5HmPEwEwZEN", InjectCodeTask.FUNCTION_NAME);
+
+        String securedCode = c.toCode();
+
+        File securedJavaFile = Utils.getFileResource("Utils-secured.java");
+        String targetCode = FileUtils.readFileToString(securedJavaFile, "UTF-8");
+
+        Assert.assertEquals(targetCode, securedCode);
+    }
 
     @Test
     public void testImportParser() {
@@ -78,6 +122,7 @@ public class TestJavaParser {
             JavaCode c = parser.parse(originalCode);
 
             String generatedCode = c.toCode();
+            Assert.assertNotNull(generatedCode);
 
             ArrayList<CodeString> stringValues = c.getStringValues();
 
@@ -97,11 +142,57 @@ public class TestJavaParser {
             c.encryptStrings("LXeyH4qdtk2YqNDnLqZzX5HmPEwEwZEN", InjectCodeTask.FUNCTION_NAME);
 
             String securedCode = c.toCode();
+            Assert.assertNotNull(securedCode);
 
         } catch (Exception ex) {
             System.out.println(ex.getClass().getName() + ": " + javaFile.getAbsolutePath());
             throw ex;
         }
+    }
+
+    @Test
+    public void testRandomNumber() {
+        int value;
+        int min = 0, max = 10;
+        for (int i = 0; i < 100; i++) {
+            value = Utils.getRandomNumberInRange(min, max);
+            Assert.assertTrue(value >= min);
+            Assert.assertTrue(value <= max);
+        }
+    }
+
+    @Test
+    public void testArrayContains() {
+        Integer[] arrayInt = new Integer[] {9, 32, 2324, 10, 90, 0, 3};
+        boolean result;
+
+        result = Utils.arrayContains(arrayInt, 2324);
+        Assert.assertTrue(result);
+
+        result = Utils.arrayContains(arrayInt, 11);
+        Assert.assertFalse(result);
+
+        result = Utils.arrayContains(arrayInt, 3);
+        Assert.assertTrue(result);
+
+        result = Utils.arrayContains(arrayInt, 2);
+        Assert.assertFalse(result);
+    }
+
+    @Test
+    public void testTextIsEmptyChar() {
+        Assert.assertTrue(TextUtils.isEmptyChar(' '));
+        Assert.assertTrue(TextUtils.isEmptyChar('\r'));
+        Assert.assertTrue(TextUtils.isEmptyChar('\n'));
+        Assert.assertTrue(TextUtils.isEmptyChar('\t'));
+
+        Assert.assertFalse(TextUtils.isEmptyChar('a'));
+        Assert.assertFalse(TextUtils.isEmptyChar('0'));
+        Assert.assertFalse(TextUtils.isEmptyChar('&'));
+        Assert.assertFalse(TextUtils.isEmptyChar('.'));
+        Assert.assertFalse(TextUtils.isEmptyChar('.'));
+        Assert.assertFalse(TextUtils.isEmptyChar(';'));
+        Assert.assertFalse(TextUtils.isEmptyChar('`'));
     }
 
 }

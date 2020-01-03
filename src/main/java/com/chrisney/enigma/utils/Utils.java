@@ -56,7 +56,7 @@ public class Utils {
     }
 
     /**
-     * Generate a random number between a range
+     * Generate a random number between a range (included min and max values)
      * @param min Min value
      * @param max Max value
      * @return Random value
@@ -106,7 +106,7 @@ public class Utils {
      * @return Hash key
      */
     public static String randomHashKey() {
-        return TextUtils.getRandomString(32, JavaCode.KEY_CHARACTERS);
+        return TextUtils.getRandomString(32, TextUtils.KEY_CHARACTERS);
     }
 
     /**
