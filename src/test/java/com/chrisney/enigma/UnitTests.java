@@ -1,3 +1,5 @@
+package com.chrisney.enigma;
+
 import com.chrisney.enigma.parser.CodeBlock;
 import com.chrisney.enigma.parser.CodeString;
 import com.chrisney.enigma.parser.JavaCode;
