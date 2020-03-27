@@ -13,6 +13,14 @@ This project is a simple Gradle plugin to help you to encrypt all String values 
 
 ## How integrate it?
 
+First of all, be sure that a SCM is initialized in your project, such as Git for example:
+```sh
+$ cd /path/of/your/project/
+$ git init
+$ git add .
+$ git commit -m "Initial commit"
+```
+
 build.gradle (project)
 ```groovy
 buildscript {
