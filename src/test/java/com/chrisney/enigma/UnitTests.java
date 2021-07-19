@@ -96,7 +96,7 @@ public class UnitTests {
             File src = new File(repoPath + File.separator + "src" + File.separator);
             if (!src.exists()) {
                 Git git = Git.cloneRepository()
-                        .setURI("https://android.googlesource.com/platform/packages/apps/Launcher3")
+                        .setURI("https://android.googlesource.com/platform/packages/apps/Launcher3#android11-dev")
                         .setDirectory(repo)
                         .call();
             }

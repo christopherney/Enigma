@@ -26,6 +26,7 @@ public class AbstractTask extends DefaultTask {
             "!.gitignore";
 
     public boolean enabled = true;
+    public boolean checkSCM = true;
     public boolean debug = false;
     public String rootProject;
     public String pathSrc;
@@ -58,6 +59,7 @@ public class AbstractTask extends DefaultTask {
      * @return True if an SCM tool is found
      */
     protected boolean checkSCM() {
+        if (!checkSCM) return true;
         boolean result = hasGit() || hasSubversion() || hasMercurial();
         if (!result) {
             System.out.println("⚠️ The project has no Source Code Management. Please setup one (Git, SVN, Mercurial) before use Enigma plugin!");

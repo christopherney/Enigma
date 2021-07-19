@@ -31,6 +31,10 @@ class EnigmaPluginExtension {
      */
     boolean injectFakeKeys = true;
     /**
+     * Enable / disable the Source Code Management check
+     */
+    boolean checkSCM = true;
+    /**
      * Enable / disable the DEBUG (verbose) mode
      */
     boolean debug = false;
