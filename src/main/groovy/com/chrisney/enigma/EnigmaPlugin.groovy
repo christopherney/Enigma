@@ -40,6 +40,7 @@ class EnigmaPlugin implements Plugin<Project> {
 
             project.task('cleanBackup', type: CleanBackupTask) {
                 enabled = extension.enabled
+                checkSCM = extension.checkSCM
                 rootProject = project.rootDir.absolutePath
                 pathSrc = project.rootDir.absolutePath + extension.srcJava
                 debug = extension.debug
@@ -47,6 +48,7 @@ class EnigmaPlugin implements Plugin<Project> {
 
             project.task('backup', type: BackupTask) {
                 enabled = extension.enabled
+                checkSCM = extension.checkSCM
                 rootProject = project.rootDir.absolutePath
                 pathSrc = project.rootDir.absolutePath + extension.srcJava
                 debug = extension.debug
@@ -54,6 +56,7 @@ class EnigmaPlugin implements Plugin<Project> {
 
             project.task('injectCode', type: InjectCodeTask) {
                 enabled = extension.enabled
+                checkSCM = extension.checkSCM
                 rootProject = project.rootDir.absolutePath
                 pathSrc = project.rootDir.absolutePath + extension.srcJava
                 hash = extension.hash
@@ -63,6 +66,7 @@ class EnigmaPlugin implements Plugin<Project> {
 
             project.task('encrypt', type: EnigmaTask) {
                 enabled = extension.enabled
+                checkSCM = extension.checkSCM
                 rootProject = project.rootDir.absolutePath
                 pathSrc = project.rootDir.absolutePath + extension.srcJava
                 hash = extension.hash
@@ -76,6 +80,7 @@ class EnigmaPlugin implements Plugin<Project> {
 
             project.task('restore', type: RestoreTask) {
                 enabled = extension.enabled
+                checkSCM = extension.checkSCM
                 rootProject = project.rootDir.absolutePath
                 pathSrc = project.rootDir.absolutePath + extension.srcJava
                 debug = extension.debug

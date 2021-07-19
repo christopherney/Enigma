@@ -32,7 +32,7 @@ buildscript {
       url "https://plugins.gradle.org/m2/"
     }
   }
-  dependencies {     
+  dependencies {
     classpath 'com.android.tools.build:gradle:3.5.2'
     // Add the Enigma classpath
     classpath 'gradle.plugin.chrisney:enigma:1.0.0.8'
@@ -50,6 +50,7 @@ apply plugin: 'com.chrisney.enigma'
 // Set Enigma options:
 enigma.enabled = true
 enigma.injectFakeKeys = true
+enigma.checkSCM = true
 enigma.ignoredClasses = ["com.my.packagename.MainActivity.java"]
 
 android {
@@ -112,6 +113,7 @@ Bellow the options of Enigma plugin:
 
 * **enigma.enabled** *(true | false)* : Enable or disable the string encryption process (default: true)
 * **enigma.injectFakeKeys** *(true | false)* : if activated, create fake string keys and injected it into your code (default: true)
+* **enigma.checkSCM** *(true | false)* : if activated, check for Source Code Management (default: true)
 * **enigma.hash** (string) : let you define your own encryption key (32 characters recommended)
 * **enigma.classes** (array of strings) : let you defined the only classes to encrypt
 * **enigma.ignoredClasses** (array of strings): define the classes to not encrypt
