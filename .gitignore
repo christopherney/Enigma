@@ -100,3 +100,6 @@ build/
 
 # Gradle 
 .gradle/
+
+.idea/.name
+.idea/compiler.xml
