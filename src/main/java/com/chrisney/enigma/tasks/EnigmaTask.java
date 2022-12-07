@@ -7,6 +7,7 @@ import com.chrisney.enigma.utils.TextUtils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.apache.commons.io.FileUtils;
+import org.gradle.internal.Pair;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -47,16 +48,19 @@ public class EnigmaTask extends AbstractTask {
             return;
         }
 
-        for (File javaFile : this.getAllJavaFiles()) {
+        for (Pair<Integer, File> pair : this.getAllJavaFiles()) {
+            File javaFile = pair.right;
+            assert javaFile != null;
             if (!isSelected(javaFile) || isIgnored(javaFile)) {
                 System.out.println("\uD83D\uDEAB️ " + javaFile.getName() + " ignored");
             } else {
-                encryptJavaFile(javaFile);
+                encryptJavaFile(pair);
             }
         }
     }
 
     private boolean isSelected(File javaFile) {
+        System.out.println("Enigma: Checking isSelected: " + javaFile.getAbsolutePath());
         if (this.classes != null) {
             for (String ignored : this.classes) {
                 String path = ignored.replace(".", File.separator)
@@ -71,6 +75,7 @@ public class EnigmaTask extends AbstractTask {
     }
 
     private boolean isIgnored(File javaFile) {
+        System.out.println("Enigma: Checking isIgnored: " + javaFile.getAbsolutePath());
         if (this.ignoredClasses != null) {
             for (String ignored : this.ignoredClasses) {
                 String path = ignored.replace(".", File.separator)
@@ -83,7 +88,13 @@ public class EnigmaTask extends AbstractTask {
         return false;
     }
 
-    private void encryptJavaFile(File srcFile) throws Exception {
+    private void encryptJavaFile(Pair<Integer, File> pair) throws Exception {
+        assert pair != null;
+        assert pair.right != null;
+        assert pair.left != null;
+
+        File srcFile = pair.right;
+        int srcIteration = pair.left;
 
         if (isEnigmaFile(srcFile)) return;
         if (isEnigmatized(srcFile)) {
@@ -96,10 +107,16 @@ public class EnigmaTask extends AbstractTask {
         JavaParser p = new JavaParser();
         JavaCode code = p.parse(contents);
 
-        code.addImport(InjectCodeTask.PACKAGE_NAME + "." + InjectCodeTask.CLASS_NAME);
+        // Change the statement per the 'iteration' of the src
+        String importPackageStatement = InjectCodeTask.PACKAGE_NAME + "_" + srcIteration + "." + InjectCodeTask.CLASS_NAME;
+
+        code.addImport(importPackageStatement);
         code.encryptStrings(hash, InjectCodeTask.FUNCTION_NAME);
 
-        if (injectFakeKeys) code.injectFakeKeys();
+        if (injectFakeKeys) {
+          System.out.println("INJECTING FAKE KEYS");
+          code.injectFakeKeys();
+        }
 
         String contentSecured = code.toCode();
         FileUtils.writeStringToFile(srcFile, contentSecured, "UTF-8");

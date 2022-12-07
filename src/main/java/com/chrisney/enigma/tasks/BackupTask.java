@@ -2,6 +2,7 @@ package com.chrisney.enigma.tasks;
 
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.internal.Pair;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -24,8 +25,9 @@ public class BackupTask extends AbstractTask {
         if (!checkSCM()) return;
         this.removeBackupDir();
         this.createBackupDir();
-        for (File javaFile : this.getAllJavaFiles()) {
-            this.backupFile(javaFile);
+        for (Pair<Integer, File> pair : this.getAllJavaFiles()) {
+            assert pair.right != null;
+            this.backupFile(pair.right);
         }
     }
 

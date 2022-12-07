@@ -1,13 +1,15 @@
 package com.chrisney.enigma.utils;
 
-import com.chrisney.enigma.parser.JavaCode;
+import static org.gradle.internal.impldep.com.google.common.io.Resources.getResource;
 
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
-
-import static org.gradle.internal.impldep.com.google.common.io.Resources.getResource;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Various helper functions

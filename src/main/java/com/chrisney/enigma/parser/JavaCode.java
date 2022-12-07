@@ -385,6 +385,9 @@ public class JavaCode {
         int sizeValue = Utils.getRandomNumberInRange(10, 30);
         String randomValue = TextUtils.getRandomString(sizeValue, TextUtils.KEY_CHARACTERS);
 
+        System.out.println("Injecting fake param: " + fakeParamName);
+        System.out.println("Injecting fake randomValue: " + randomValue);
+
         injectFakeKeys(fakeParamName, randomValue);
     }
 
@@ -398,7 +401,12 @@ public class JavaCode {
         ArrayList<CodeBlock> classBlocks = getBlocksByType(CodeBlock.BlockType.Class);
         ArrayList<CodeBlock> functions = getFunctions();
 
+        System.out.println("classBlocks size: " + classBlocks.size());
+        System.out.println("functions size: " + functions.size());
+
         if (Utils.arrayNotEmpty(classBlocks) && Utils.arrayNotEmpty(functions)) {
+
+          System.out.println("Utils.arrayNotEmpty(classBlocks) && Utils.arrayNotEmpty(functions)  PASSED");
 
             // Generate fake code:
             String fakeAttribute = getFakeAttribute(fakeParamName, randomValue);
