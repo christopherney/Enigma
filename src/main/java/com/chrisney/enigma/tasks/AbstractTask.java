@@ -4,10 +4,12 @@ import com.chrisney.enigma.utils.Utils;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.Internal;
+import org.gradle.internal.Pair;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,6 +31,7 @@ public class AbstractTask extends DefaultTask {
     public boolean debug = false;
     public String rootProject;
     public String pathSrc;
+    public String[] pathSrcs;
 
     public AbstractTask() {
         this.setGroup("enigma");
@@ -39,8 +42,32 @@ public class AbstractTask extends DefaultTask {
      * @return Collection of all JAVA files (*.java)
      */
     @Internal
-    protected Collection<File> getAllJavaFiles() {
-        return Utils.listFileTree(new File(pathSrc), ".java");
+    protected Collection<Pair<Integer, File>> getAllJavaFiles() {
+        System.out.println("Enigma pathSrcs:[");
+        for(String src : pathSrcs) {
+            System.out.println("\tEnigma src: " + src);
+        }
+        System.out.println("Enigma ]");
+
+        Collection<Pair<Integer, File>> ret = new java.util.ArrayList<>(Collections.emptyList());
+        if(pathSrcs.length <= 0) {
+            Collection<File> files = Utils.listFileTree(new File(pathSrc), ".java");
+            for(File file : files) {
+                ret.add(Pair.of(0, file));
+            }
+            return ret;
+        }
+        else {
+            int index = 0;
+            for(String src : pathSrcs) {
+                Collection<File> files = Utils.listFileTree(new File(src), ".java");
+                for(File file : files) {
+                    ret.add(Pair.of(index, file));
+                }
+                index++;
+            }
+            return ret;
+        }
     }
 
     /**
@@ -50,7 +77,16 @@ public class AbstractTask extends DefaultTask {
      */
     @Internal
     protected Collection<File> getAllXmlFiles() {
-        return Utils.listFileTree(new File(pathSrc), ".xml");
+        if(pathSrcs.length <= 0) {
+            Utils.listFileTree(new File(pathSrc), ".xml");
+        }
+
+        Collection<File> ret = new java.util.ArrayList<>(Collections.emptyList());
+
+        for(String src : pathSrcs) {
+            ret.addAll(Utils.listFileTree(new File(src), ".xml"));
+        }
+        return ret;
     }
 
     /**

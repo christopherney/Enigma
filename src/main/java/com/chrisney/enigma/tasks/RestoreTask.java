@@ -2,6 +2,7 @@ package com.chrisney.enigma.tasks;
 
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.internal.Pair;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -12,6 +13,23 @@ import java.io.IOException;
  * @author Christopher Ney
  */
 public class RestoreTask extends AbstractTask {
+
+    class RemoveCodeRunnable implements Runnable {
+        private final String src;
+
+        RemoveCodeRunnable(String src) {
+            this.src = src;
+        }
+
+        @Override
+        public void run() {
+            try {
+                removeCode(this.src);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to RemoveCode, src: " + src, e);
+            }
+        }
+    }
 
     @Inject
     public RestoreTask() {
@@ -24,7 +42,9 @@ public class RestoreTask extends AbstractTask {
         if (!checkSCM()) return;
 
         if (backupDirExists()) {
-            for (File javaFile : this.getAllJavaFiles()) {
+            for (Pair<Integer, File> pair : this.getAllJavaFiles()) {
+                File javaFile = pair.right;
+                assert javaFile != null;
                 this.restoreFile(javaFile);
             }
         } else {
@@ -33,10 +53,21 @@ public class RestoreTask extends AbstractTask {
         removeEnigmaCode();
     }
 
-    private void removeEnigmaCode() throws IOException {
-        File codePackage = new File(pathSrc + File.separator + InjectCodeTask.PACKAGE_NAME.replace(".", File.separator));
+    private void removeCode(String src) throws IOException {
+        File codePackage = new File(src + File.separator + InjectCodeTask.PACKAGE_NAME.replace(".", File.separator));
         FileUtils.deleteDirectory(codePackage);
         System.out.println("\uD83E\uDDF9 Remove Enigma code: " + codePackage.getAbsolutePath());
+    }
+
+    private void removeEnigmaCode() {
+        if(pathSrcs.length <= 0) {
+            new RemoveCodeRunnable(pathSrc).run();
+        }
+        else {
+            for(String src : pathSrcs) {
+                new RemoveCodeRunnable(src).run();
+            }
+        }
     }
 
     private void restoreFile(File file) throws IOException {

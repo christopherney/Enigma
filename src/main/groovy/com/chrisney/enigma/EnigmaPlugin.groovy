@@ -42,6 +42,17 @@ class EnigmaPlugin implements Plugin<Project> {
                 enabled = extension.enabled
                 rootProject = project.rootDir.absolutePath
                 pathSrc = project.rootDir.absolutePath + extension.srcJava
+
+                pathSrcs = []
+                project.rootProject.getAllprojects().forEach { proj ->
+                    if(proj.rootDir.absolutePath != proj.projectDir.absolutePath) {
+                        pathSrcs += proj.projectDir.absolutePath + "/src/main/java/"
+                    }
+                    else {
+                        println("Ignoring root: " + proj.projectDir.absolutePath)
+                    }
+                }
+
                 debug = extension.debug
             }
 
@@ -49,6 +60,17 @@ class EnigmaPlugin implements Plugin<Project> {
                 enabled = extension.enabled
                 rootProject = project.rootDir.absolutePath
                 pathSrc = project.rootDir.absolutePath + extension.srcJava
+
+                pathSrcs = []
+                project.rootProject.getAllprojects().forEach { proj ->
+                    if(proj.rootDir.absolutePath != proj.projectDir.absolutePath) {
+                        pathSrcs += proj.projectDir.absolutePath + "/src/main/java/"
+                    }
+                    else {
+                        println("Ignoring root: " + proj.projectDir.absolutePath)
+                    }
+                }
+
                 debug = extension.debug
             }
 
@@ -56,6 +78,17 @@ class EnigmaPlugin implements Plugin<Project> {
                 enabled = extension.enabled
                 rootProject = project.rootDir.absolutePath
                 pathSrc = project.rootDir.absolutePath + extension.srcJava
+
+                pathSrcs = []
+                project.rootProject.getAllprojects().forEach { proj ->
+                    if(proj.rootDir.absolutePath != proj.projectDir.absolutePath) {
+                        pathSrcs += proj.projectDir.absolutePath + "/src/main/java/"
+                    }
+                    else {
+                        println("Ignoring root: " + proj.projectDir.absolutePath)
+                    }
+                }
+
                 hash = extension.hash
                 customFunction = extension.customFunction
                 debug = extension.debug
@@ -65,6 +98,17 @@ class EnigmaPlugin implements Plugin<Project> {
                 enabled = extension.enabled
                 rootProject = project.rootDir.absolutePath
                 pathSrc = project.rootDir.absolutePath + extension.srcJava
+
+                pathSrcs = []
+                project.rootProject.getAllprojects().forEach { proj ->
+                    if(proj.rootDir.absolutePath != proj.projectDir.absolutePath) {
+                        pathSrcs += proj.projectDir.absolutePath + "/src/main/java/"
+                    }
+                    else {
+                        println("Ignoring root: " + proj.projectDir.absolutePath)
+                    }
+                }
+
                 hash = extension.hash
                 ignoredClasses = extension.ignoredClasses
                 classes = extension.classes
@@ -78,6 +122,17 @@ class EnigmaPlugin implements Plugin<Project> {
                 enabled = extension.enabled
                 rootProject = project.rootDir.absolutePath
                 pathSrc = project.rootDir.absolutePath + extension.srcJava
+
+                pathSrcs = []
+                project.rootProject.getAllprojects().forEach { proj ->
+                    if(proj.rootDir.absolutePath != proj.projectDir.absolutePath) {
+                        pathSrcs += proj.projectDir.absolutePath + "/src/main/java/"
+                    }
+                    else {
+                        println("Ignoring root: " + proj.projectDir.absolutePath)
+                    }
+                }
+
                 debug = extension.debug
             }
 

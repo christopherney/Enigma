@@ -14,14 +14,36 @@ import java.io.IOException;
  */
 public class InjectCodeTask extends AbstractTask {
 
+    class AddFileRunnable implements Runnable {
+        private final String src;
+        private final int iteration;
+
+        AddFileRunnable(int iteration, String src) {
+            this.iteration = iteration;
+            this.src = src;
+        }
+
+        @Override
+        public void run() {
+            try {
+                addFile(this.iteration, this.src);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to AddFile, src: " + src, e);
+            }
+        }
+    }
+
     public static final String PACKAGE_NAME = "com.chrisney.enigma";
     public static final String CLASS_NAME = "EnigmaUtils";
     public static final String FUNCTION_NAME = InjectCodeTask.CLASS_NAME + ".enigmatization";
     public static final String IMPORT_NAME = "import " + InjectCodeTask.PACKAGE_NAME + "." + InjectCodeTask.CLASS_NAME + ";";
 
-    public static final String SOURCE_CODE = "package " + PACKAGE_NAME + ";\n" +
-            "\n" +
-            "import javax.crypto.Cipher;\n" +
+    public static final String SOURCE_CODE_PACKAGE_STATEMENT = "package " + PACKAGE_NAME;
+    public static final String getSourceCodePackageStatement(int iteration) {
+        return SOURCE_CODE_PACKAGE_STATEMENT + "_" + iteration + ";\n\n";
+    }
+
+    public static final String SOURCE_CODE = "import javax.crypto.Cipher;\n" +
             "import javax.crypto.SecretKey;\n" +
             "import javax.crypto.spec.SecretKeySpec;\n" +
             "import javax.crypto.spec.IvParameterSpec;\n" +
@@ -65,6 +87,16 @@ public class InjectCodeTask extends AbstractTask {
         super();
     }
 
+    private void addFile(int iteration, String src) throws IOException {
+        File packageName = new File(src + File.separator + PACKAGE_NAME.replace(".",  File.separator) + "_" + iteration);
+        if (!packageName.exists()) packageName.mkdir();
+
+        File codeFile = new File(packageName.getAbsolutePath() + File.separator + CLASS_NAME + ".java");
+        String data = encodeHash(getSourceCodePackageStatement(iteration) + SOURCE_CODE);
+        System.out.println("addFile, adding with package statement: " + getSourceCodePackageStatement(iteration));
+        FileUtils.writeStringToFile(codeFile, data, "UTF-8");
+    }
+
     @TaskAction
     public void addCode() throws IOException {
         if (!enabled) return;
@@ -76,12 +108,17 @@ public class InjectCodeTask extends AbstractTask {
             System.out.println("⚠️ Missing Hash value to inject Enigma code");
             return;
         }
-        File packageName = new File(pathSrc + File.separator + PACKAGE_NAME.replace(".",  File.separator));
-        if (!packageName.exists()) packageName.mkdir();
 
-        File codeFile = new File(packageName.getAbsolutePath() + File.separator + CLASS_NAME + ".java");
-        String data = encodeHash(SOURCE_CODE);
-        FileUtils.writeStringToFile(codeFile, data, "UTF-8");
+        if(pathSrcs.length <= 0) {
+            new AddFileRunnable(0, pathSrc).run();
+        }
+        else {
+            int index = 0;
+            for(String src : pathSrcs) {
+                new AddFileRunnable(index, src).run();
+                index++;
+            }
+        }
 
         System.out.println("✏️ Add Enigma code");
     }
