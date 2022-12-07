@@ -100,3 +100,5 @@ build/
 
 # Gradle 
 .gradle/
+
+.idea/
