@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_enigma.test" default="compile.module.enigma.test">
+  <dirname property="module.enigma.test.basedir" file="${ant.file.module_enigma.test}"/>
+  
+  <property name="module.jdk.home.enigma.test" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.enigma.test" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.enigma.test" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.enigma.test" value="-encoding UTF-8 -source 8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="enigma.test.output.dir" value="undefined"/>
+  <property name="enigma.test.testoutput.dir" value="${module.enigma.test.basedir}/../../build/classes/java/test"/>
+  
+  <path id="enigma.test.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="enigma.test.module.production.classpath">
+    <path refid="${module.jdk.classpath.enigma.test}"/>
+    <pathelement location="${enigma.main.output.dir}"/>
+    <pathelement location="${basedir}/../.gradle/caches/5.2.1/generated-gradle-jars/gradle-api-5.2.1.jar"/>
+    <pathelement location="${basedir}/../.gradle/wrapper/dists/gradle-5.2.1-all/bviwmvmbexq6idcscbicws5me/gradle-5.2.1/lib/groovy-all-1.0-2.5.4.jar"/>
+    <pathelement location="${basedir}/../.gradle/wrapper/dists/gradle-5.2.1-all/bviwmvmbexq6idcscbicws5me/gradle-5.2.1/lib/gradle-installation-beacon-5.2.1.jar"/>
+    <pathelement location="${basedir}/../.gradle/caches/5.2.1/generated-gradle-jars/gradle-api-5.2.1.jar"/>
+    <path refid="library.gradle:_org.codehaus.groovy:groovy-all:2.3.11.classpath"/>
+    <path refid="library.gradle:_junit:junit:4.12.classpath"/>
+    <path refid="library.gradle:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+    <pathelement location="${basedir}/../.gradle/wrapper/dists/gradle-5.2.1-all/bviwmvmbexq6idcscbicws5me/gradle-5.2.1/lib/gradle-installation-beacon-5.2.1.jar"/>
+  </path>
+  
+  <path id="enigma.test.runtime.production.module.classpath">
+    <path refid="enigma.main.runtime.production.module.classpath"/>
+    <pathelement location="${basedir}/../.gradle/caches/5.2.1/generated-gradle-jars/gradle-api-5.2.1.jar"/>
+    <pathelement location="${basedir}/../.gradle/wrapper/dists/gradle-5.2.1-all/bviwmvmbexq6idcscbicws5me/gradle-5.2.1/lib/groovy-all-1.0-2.5.4.jar"/>
+    <pathelement location="${basedir}/../.gradle/wrapper/dists/gradle-5.2.1-all/bviwmvmbexq6idcscbicws5me/gradle-5.2.1/lib/gradle-installation-beacon-5.2.1.jar"/>
+    <pathelement location="${basedir}/../.gradle/caches/5.2.1/generated-gradle-jars/gradle-api-5.2.1.jar"/>
+    <path refid="library.gradle:_org.codehaus.groovy:groovy-all:2.3.11.classpath"/>
+    <path refid="library.gradle:_junit:junit:4.12.classpath"/>
+    <path refid="library.gradle:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+    <pathelement location="${basedir}/../.gradle/wrapper/dists/gradle-5.2.1-all/bviwmvmbexq6idcscbicws5me/gradle-5.2.1/lib/gradle-installation-beacon-5.2.1.jar"/>
+  </path>
+  
+  <path id="enigma.test.module.classpath">
+    <path refid="${module.jdk.classpath.enigma.test}"/>
+    <pathelement location="${enigma.main.output.dir}"/>
+    <pathelement location="${basedir}/../.gradle/caches/5.2.1/generated-gradle-jars/gradle-api-5.2.1.jar"/>
+    <pathelement location="${basedir}/../.gradle/wrapper/dists/gradle-5.2.1-all/bviwmvmbexq6idcscbicws5me/gradle-5.2.1/lib/groovy-all-1.0-2.5.4.jar"/>
+    <pathelement location="${basedir}/../.gradle/wrapper/dists/gradle-5.2.1-all/bviwmvmbexq6idcscbicws5me/gradle-5.2.1/lib/gradle-installation-beacon-5.2.1.jar"/>
+    <pathelement location="${basedir}/../.gradle/caches/5.2.1/generated-gradle-jars/gradle-api-5.2.1.jar"/>
+    <path refid="library.gradle:_org.codehaus.groovy:groovy-all:2.3.11.classpath"/>
+    <path refid="library.gradle:_junit:junit:4.12.classpath"/>
+    <path refid="library.gradle:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+    <pathelement location="${basedir}/../.gradle/wrapper/dists/gradle-5.2.1-all/bviwmvmbexq6idcscbicws5me/gradle-5.2.1/lib/gradle-installation-beacon-5.2.1.jar"/>
+  </path>
+  
+  <path id="enigma.test.runtime.module.classpath">
+    <pathelement location="${enigma.test.testoutput.dir}"/>
+    <path refid="enigma.main.runtime.module.classpath"/>
+    <pathelement location="${basedir}/../.gradle/caches/5.2.1/generated-gradle-jars/gradle-api-5.2.1.jar"/>
+    <pathelement location="${basedir}/../.gradle/wrapper/dists/gradle-5.2.1-all/bviwmvmbexq6idcscbicws5me/gradle-5.2.1/lib/groovy-all-1.0-2.5.4.jar"/>
+    <pathelement location="${basedir}/../.gradle/wrapper/dists/gradle-5.2.1-all/bviwmvmbexq6idcscbicws5me/gradle-5.2.1/lib/gradle-installation-beacon-5.2.1.jar"/>
+    <pathelement location="${basedir}/../.gradle/caches/5.2.1/generated-gradle-jars/gradle-api-5.2.1.jar"/>
+    <path refid="library.gradle:_org.codehaus.groovy:groovy-all:2.3.11.classpath"/>
+    <path refid="library.gradle:_junit:junit:4.12.classpath"/>
+    <path refid="library.gradle:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+    <pathelement location="${basedir}/../.gradle/wrapper/dists/gradle-5.2.1-all/bviwmvmbexq6idcscbicws5me/gradle-5.2.1/lib/gradle-installation-beacon-5.2.1.jar"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.enigma.test">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.enigma.test">
+    <patternset refid="excluded.from.module.enigma.test"/>
+  </patternset>
+  
+  <path id="enigma.test.module.test.sourcepath">
+    <dirset dir="${module.enigma.test.basedir}/../../src/test">
+      <include name="java"/>
+      <include name="resources"/>
+      <include name="groovy"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.enigma.test" depends="compile.module.enigma.test.production,compile.module.enigma.test.tests" description="Compile module enigma.test"/>
+  
+  <target name="compile.module.enigma.test.production" depends="register.custom.compilers,compile.module.enigma.main" description="Compile module enigma.test; production classes"/>
+  
+  <target name="compile.module.enigma.test.tests" depends="register.custom.compilers,compile.module.enigma.test.production" description="compile module enigma.test; test classes" unless="skip.tests">
+    <mkdir dir="${enigma.test.testoutput.dir}"/>
+    <javac2 destdir="${enigma.test.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.enigma.test}/javac">
+      <compilerarg line="${compiler.args.enigma.test}"/>
+      <bootclasspath refid="enigma.test.module.bootclasspath"/>
+      <classpath refid="enigma.test.module.classpath"/>
+      <src refid="enigma.test.module.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.enigma.test"/>
+    </javac2>
+    
+    <copy todir="${enigma.test.testoutput.dir}">
+      <fileset dir="${module.enigma.test.basedir}/../../src/test/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.enigma.test.basedir}/../../src/test/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.enigma.test.basedir}/../../src/test/groovy">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="clean.module.enigma.test" description="cleanup module">
+    <delete dir="${enigma.test.output.dir}"/>
+    <delete dir="${enigma.test.testoutput.dir}"/>
+  </target>
+</project>
